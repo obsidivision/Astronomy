@@ -1,0 +1,2913 @@
+<title>천구와 행성 겉보기 운동</title>
+<style>
+:root{
+  --bg:#0a0e1a; --bg2:#111827; --bg3:#161f33; --line:#26324b;
+  --tx:#e8edf7; --tx2:#a9b8d4; --tx3:#8595b4;
+  --acc:#6cc5ff; --acc2:#ffd479; --ok:#7ee787; --warn:#ff9f7a; --vio:#c792ea;
+  --retro:#ff8a7a; --pro:#7ee787;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);
+  font-family:"Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:15px;line-height:1.55;-webkit-text-size-adjust:100%}
+.wrap{max-width:1220px;margin:0 auto;padding:12px 12px 60px}
+h1{font-size:19px;margin:0 0 2px;letter-spacing:-.02em}
+h2{font-size:16px;margin:0 0 8px;color:var(--acc)}
+h3{font-size:14px;margin:14px 0 6px;color:var(--acc2)}
+.sub{margin:0;color:var(--tx3);font-size:12.5px}
+header{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-end;justify-content:space-between;
+  padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:10px}
+button,select,input[type=number],input[type=text]{font-family:inherit;font-size:14px}
+button{min-height:44px;padding:0 14px;border-radius:9px;border:1px solid var(--line);
+  background:var(--bg3);color:var(--tx);cursor:pointer;touch-action:manipulation}
+button:hover{border-color:var(--acc);color:var(--acc)}
+button:active{transform:translateY(1px)}
+button.sm{min-height:38px;padding:0 10px;font-size:13px}
+button.on{background:#1d3a5c;border-color:var(--acc);color:#cfe9ff}
+button.ghost{background:transparent}
+select,input[type=number],input[type=text]{min-height:44px;padding:0 10px;border-radius:9px;
+  border:1px solid var(--line);background:var(--bg3);color:var(--tx)}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:34px;background:transparent;margin:0}
+input[type=range]::-webkit-slider-runnable-track{height:7px;background:#22304a;border-radius:4px}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;border-radius:50%;
+  background:var(--acc);border:3px solid #0a0e1a;margin-top:-11px;cursor:pointer}
+input[type=range]::-moz-range-track{height:7px;background:#22304a;border-radius:4px}
+input[type=range]::-moz-range-thumb{width:26px;height:26px;border-radius:50%;background:var(--acc);border:3px solid #0a0e1a;cursor:pointer}
+.bar{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:10px;
+  position:sticky;top:0;z-index:20}
+.ctl{display:grid;grid-template-columns:88px 1fr auto;gap:8px;align-items:center;margin:4px 0}
+.ctl>label{color:var(--tx2);font-size:13px}
+.val{font-variant-numeric:tabular-nums;color:var(--tx);font-size:13.5px;white-space:nowrap}
+.row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.tabs{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:12px}
+.tabs button{font-size:13px;padding:0 4px;line-height:1.25}
+.tabpanel[hidden]{display:none}
+.grid2{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:12px}
+.grid2e{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px}
+canvas{display:block;width:100%;background:#070b14;border-radius:10px;border:1px solid var(--line);touch-action:none}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;font-size:13.5px;font-variant-numeric:tabular-nums}
+.kv b{color:var(--tx2);font-weight:500}
+.kv span{text-align:right}
+.tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:12px;border:1px solid var(--line);background:var(--bg3);color:var(--tx2)}
+.tag.g{color:#9ff0b4;border-color:#2b5c3a}.tag.r{color:#ffb3a6;border-color:#6b332a}
+.tag.b{color:#bfe4ff;border-color:#2b4c6b}.tag.y{color:#ffe6ad;border-color:#6b5a2a}
+.note{background:#141d2e;border:1px solid #2b3b57;border-left:3px solid var(--acc2);
+  border-radius:10px;padding:10px 12px;font-size:13px;color:var(--tx2);margin-bottom:10px}
+.note b{color:var(--acc2)}
+.small{font-size:12.5px;color:var(--tx3)}
+.eq{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12.5px;color:var(--acc);
+  background:#0d1524;border:1px solid var(--line);border-radius:7px;padding:5px 8px;display:inline-block;margin:2px 0}
+.legend{display:flex;flex-wrap:wrap;gap:10px;font-size:12.5px;color:var(--tx2);margin-top:6px}
+.legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:4px;border-radius:2px}
+.toggles{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.toggles button{min-height:36px;font-size:12.5px;padding:0 9px;border-radius:8px}
+.strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px}
+.thumb{background:var(--bg3);border:1px solid var(--line);border-radius:10px;padding:6px;cursor:pointer;text-align:center}
+.thumb:hover{border-color:var(--acc)}
+.thumb canvas{background:#05080f;border:none;margin-bottom:4px}
+.thumb .t1{font-size:12px;color:var(--tx)}
+.thumb .t2{font-size:11px;color:var(--tx3);font-variant-numeric:tabular-nums}
+.q{border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin-bottom:9px;background:var(--bg2)}
+.q .qh{font-size:12px;color:var(--acc2);margin-bottom:3px}
+.q .qt{font-size:14px;margin-bottom:8px;white-space:pre-line}
+.q .exp{margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);font-size:13px;color:var(--tx2);white-space:pre-line}
+.choices{display:grid;gap:6px}
+.choices button{text-align:left;justify-content:flex-start;padding:8px 12px;line-height:1.35;height:auto;min-height:44px}
+.choices button.right{background:#123423;border-color:#2f7a4d;color:#c8f6d8}
+.choices button.wrong{background:#3a1a19;border-color:#7a3a33;color:#ffc9c0}
+table.vt{width:100%;border-collapse:collapse;font-size:12.5px;font-variant-numeric:tabular-nums}
+table.vt th,table.vt td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top}
+table.vt th{color:var(--tx3);font-weight:500}
+td.p{color:#9ff0b4;font-weight:600}td.f{color:#ff9f8f;font-weight:600}
+#verify{position:fixed;inset:16px;z-index:60;background:#0b1120f2;border:1px solid var(--acc);
+  border-radius:14px;padding:14px;overflow:auto;backdrop-filter:blur(3px)}
+.hr{height:1px;background:var(--line);margin:10px 0}
+.warnbox{background:#2a1f14;border:1px solid #6b4a22;color:#ffdcae;border-radius:9px;padding:8px 10px;font-size:13px}
+.okbox{background:#132a1c;border:1px solid #2f6b45;color:#c8f6d8;border-radius:9px;padding:8px 10px;font-size:13px}
+@media(max-width:700px){
+  .grid2,.grid2e{grid-template-columns:1fr}
+  .tabs{grid-template-columns:repeat(3,1fr)}
+  .ctl{grid-template-columns:70px 1fr;grid-template-areas:"l s" "v v"}
+  .ctl>label{grid-area:l}.ctl>input[type=range]{grid-area:s}.ctl>.val{grid-area:v;text-align:right}
+  h1{font-size:17px}
+  .wrap{padding:8px 8px 50px}
+}
+</style>
+<div class="wrap">
+<header>
+  <div>
+    <h1>천구와 행성의 겉보기 운동 시뮬레이터</h1>
+    <p class="sub">지구과학 Ⅲ-1 태양계 천체 · 01. 태양계 행성의 겉보기 운동 · 학습지 00 ~ 04 대응</p>
+  </div>
+  <div class="row">
+    <button class="sm" id="btnNote">참고 사항</button>
+    <button class="sm" id="btnVerify">검증 (v)</button>
+  </div>
+</header>
+
+<div class="note" id="noteBox" hidden>
+  <b>이 시뮬레이터에 대하여</b><br>
+  · 화면의 모든 각도는 상수를 손으로 맞춘 것이 아니라 공식으로 계산한 값입니다. <code class="eq">v</code> 키 또는 위의 검증 단추로 자체 검증표를 볼 수 있습니다.<br>
+  · <b>학습지 오타로 보이는 부분</b>: 학습지 2 에 "태양이 별자리들 사이를 동 → 서 로 움직여" 라는 줄이 있습니다.
+  같은 학습지의 다른 부분과 학습지 3 은 모두 <b>서 → 동 (적경이 증가하는 방향)</b> 이라고 되어 있고, 물리적으로도 서 → 동 이 맞습니다.
+  빈칸이거나 오타일 수 있으니 종이 원본을 다시 확인하세요. 이 시뮬레이터는 <b>서 → 동</b> 으로 구현했습니다.<br>
+  · 궤도는 <b>원궤도</b> 로 근사했고 이심률은 넣지 않았습니다. 그래서 태양은 황도를 하루 0.9856도씩 균일하게 움직입니다.
+  기준점을 춘분에 맞추었으므로 모형의 춘분은 3월 21일, 하지는 6월 21일에 오지만,
+  추분은 9월 20일경, 동지는 12월 20일경으로 실제보다 2 ~ 3일 이릅니다.
+  절기 그 자체(황경 0 / 90 / 180 / 270도)에서의 적경, 적위, 낮의 길이는 정확합니다.<br>
+  · 낮의 길이는 <b>기하학적 계산</b> 입니다. 대기 굴절과 태양의 시반경은 넣지 않아 실제 일출 일몰보다 하루에 약 6 ~ 8분 짧게 나옵니다.<br>
+  · 내행성 최대이각은 원궤도 값(수성 22.8도, 금성 46.3도)입니다. 학습지의 18 ~ 28도, 약 45도 라는 범위는 궤도 이심률 때문에 생깁니다.
+</div>
+
+<div class="bar">
+  <div class="ctl">
+    <label for="sDay">날짜</label>
+    <input type="range" id="sDay" min="0" max="3652" step="1" value="0">
+    <div class="val" id="vDay">-</div>
+  </div>
+  <div class="ctl">
+    <label for="sHour">시각</label>
+    <input type="range" id="sHour" min="0" max="1439" step="1" value="1260">
+    <div class="val" id="vHour">-</div>
+  </div>
+  <div class="ctl">
+    <label for="sLat">위도</label>
+    <input type="range" id="sLat" min="-90" max="90" step="0.5" value="36.5">
+    <div class="val" id="vLat">-</div>
+  </div>
+  <div class="row" style="margin-top:6px">
+    <button class="sm" id="btnPlay">재생</button>
+    <select id="selSpeed" aria-label="속도">
+      <option value="0.0417">1시간 / 초</option>
+      <option value="0.25">6시간 / 초</option>
+      <option value="1" selected>1일 / 초</option>
+      <option value="5">5일 / 초</option>
+      <option value="20">20일 / 초</option>
+    </select>
+    <button class="sm" data-dday="-30">-30일</button>
+    <button class="sm" data-dday="-1">-1일</button>
+    <button class="sm" data-dday="1">+1일</button>
+    <button class="sm" data-dday="30">+30일</button>
+    <button class="sm" id="btnNow">오늘</button>
+  </div>
+</div>
+
+<nav class="tabs" id="tabs">
+  <button data-tab="1" class="on">1. 천구와<br>지평좌표계</button>
+  <button data-tab="2">2. 적도좌표계<br>와 황도</button>
+  <button data-tab="3">3. 행성의<br>겉보기 운동</button>
+  <button data-tab="4">4. 위치 관계<br>와 위상</button>
+  <button data-tab="5">5. 문제 풀이</button>
+</nav>
+<!-- ================= TAB 1 ================= -->
+<section class="tabpanel" id="tab1">
+ <div class="grid2">
+  <div class="card">
+    <h2>천구 (celestial sphere)</h2>
+    <div class="toggles" id="t1Toggles"></div>
+    <canvas id="cvSky1" data-ar="0.92"></canvas>
+    <div class="row" id="t1Views" style="margin-top:6px"></div>
+    <div class="small" style="margin-top:6px">구를 손가락이나 마우스로 끌어 돌리세요. 별 놓기 모드에서는 구를 눌러 별을 직접 놓을 수 있습니다.</div>
+    <div class="legend">
+      <span><i style="background:#6cc5ff"></i>주극성</span>
+      <span><i style="background:#ffffff"></i>출몰성</span>
+      <span><i style="background:#8595b4"></i>전몰성 (점선)</span>
+      <span><i style="background:#ffd479"></i>천구의 적도</span>
+      <span><i style="background:#7ee787"></i>지평선</span>
+    </div>
+  </div>
+  <div>
+    <div class="card">
+      <h2>위도 (latitude)</h2>
+      <div class="row">
+        <button class="sm" data-lat="90">극지역 90도</button>
+        <button class="sm" data-lat="36.5">중위도 36.5도 (세종)</button>
+        <button class="sm" data-lat="0">적도 0도</button>
+        <button class="sm" data-lat="-36.5">남반구 -36.5도</button>
+      </div>
+      <div class="hr"></div>
+      <div class="kv">
+        <b>천구북극의 고도 = 위도</b><span id="k1pole">-</span>
+        <b>일주권과 지평선이 이루는 각</b><span id="k1tilt">-</span>
+        <b>주극성 (never sets) 경계</b><span id="k1cp">-</span>
+        <b>전몰성 (never rises) 경계</b><span id="k1nv">-</span>
+      </div>
+      <div id="k1case" class="small" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h2>별의 위치</h2>
+      <div class="row" style="margin-bottom:8px">
+        <label class="small" for="inRa">적경 (RA) h</label>
+        <input type="number" id="inRa" step="0.1" min="0" max="24" style="width:92px">
+        <label class="small" for="inDec">적위 (Dec) 도</label>
+        <input type="number" id="inDec" step="1" min="-90" max="90" style="width:92px">
+      </div>
+      <div class="row" style="margin-bottom:8px">
+        <button class="sm" id="btnPlace">별 놓기 모드: 끄기</button>
+        <button class="sm" id="btnDiurnal">일주운동 (diurnal motion) 재생</button>
+      </div>
+      <div class="kv">
+        <b>시간각 (hour angle) H</b><span id="k1H">-</span>
+        <b>방위각 (azimuth) A</b><span id="k1A">-</span>
+        <b>고도 (altitude) h</b><span id="k1h">-</span>
+        <b>천정거리 (zenith distance) Z</b><span id="k1Z">-</span>
+        <b>h + Z</b><span id="k1sum">-</span>
+        <b>별의 종류</b><span id="k1type">-</span>
+        <b>남중 고도</b><span id="k1mer">-</span>
+        <b>지평선 위에 있는 시간</b><span id="k1up">-</span>
+      </div>
+      <div class="small" style="margin-top:8px">
+        방위각 A 는 <b>북점에서 시계방향</b> (북 → 동 → 남 → 서) 으로 별의 수직권까지 잰 각,
+        고도 h 는 지평선에서 수직권을 따라 잰 각입니다. 관측자의 위치와 시각이 바뀌면 값이 달라집니다.
+      </div>
+    </div>
+  </div>
+ </div>
+</section>
+
+<!-- ================= TAB 2 ================= -->
+<section class="tabpanel" id="tab2" hidden>
+ <div class="grid2">
+  <div class="card">
+    <h2>적도좌표계 (equatorial coordinate system) 와 황도 (ecliptic)</h2>
+    <div class="toggles" id="t2Toggles"></div>
+    <canvas id="cvSky2" data-ar="0.92"></canvas>
+    <div class="row" id="t2Views" style="margin-top:6px"></div>
+    <div class="row" style="margin-top:8px">
+      <button class="sm" id="btnSweep">적경 · 적위 재기 애니메이션</button>
+      <button class="sm" id="btnSunFollow">태양을 별 위치로 가져오기</button>
+    </div>
+    <div class="legend">
+      <span><i style="background:#ffd479"></i>천구의 적도</span>
+      <span><i style="background:#ff9f7a"></i>황도</span>
+      <span><i style="background:#c792ea"></i>적경 호</span>
+      <span><i style="background:#6cc5ff"></i>적위 호</span>
+      <span><i style="background:#7ee787"></i>지평선</span>
+    </div>
+  </div>
+  <div>
+    <div class="card">
+      <h2>같은 천체, 두 좌표계</h2>
+      <div class="small" style="margin-bottom:6px">시각을 흘려 보면서 두 쌍의 값을 비교하세요. 하나는 변하고 하나는 변하지 않습니다.</div>
+      <div class="kv">
+        <b>적경 (RA) α</b><span id="k2ra">-</span>
+        <b>적위 (Dec) δ</b><span id="k2dec">-</span>
+        <b>방위각 (azimuth) A</b><span id="k2A">-</span>
+        <b>고도 (altitude) h</b><span id="k2h">-</span>
+      </div>
+      <div id="k2fix" class="small" style="margin-top:7px"></div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h2>태양의 연주운동 (annual motion)</h2>
+      <div class="ctl">
+        <label for="sDate2">날짜</label>
+        <input type="range" id="sDate2" min="0" max="364" step="1" value="0">
+        <div class="val" id="vDate2">-</div>
+      </div>
+      <div class="row" style="margin-bottom:6px" id="t2Season"></div>
+      <div class="kv">
+        <b>태양의 황경 (ecliptic longitude) λ</b><span id="k2slam">-</span>
+        <b>태양의 적경 (RA)</b><span id="k2sra">-</span>
+        <b>태양의 적위 (Dec)</b><span id="k2sdec">-</span>
+        <b>낮의 길이</b><span id="k2day">-</span>
+        <b>밤의 길이</b><span id="k2night">-</span>
+        <b>오늘의 적경 증가량</b><span id="k2rate">-</span>
+      </div>
+      <div class="small" style="margin-top:7px">
+        태양은 황도를 따라 <b>하루 약 1도씩 서 → 동 (적경이 증가하는 방향)</b> 으로 움직입니다.
+        1년에 한 바퀴이므로 하루 약 <b>3분 56초</b> (약 0.99도) 씩 적경이 늘어납니다. 태양은 절대 역행하지 않습니다.
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h2>태양의 적위와 낮의 길이</h2>
+      <canvas id="cvSunChart" data-ar="0.62"></canvas>
+      <div class="legend">
+        <span><i style="background:#ffd479"></i>태양의 적위 (도)</span>
+        <span><i style="background:#6cc5ff"></i>낮의 길이 (시간)</span>
+        <span><i style="background:#ff9f7a"></i>오늘</span>
+      </div>
+    </div>
+  </div>
+ </div>
+</section>
+<!-- ================= TAB 3 ================= -->
+<section class="tabpanel" id="tab3" hidden>
+ <div class="card" style="margin-bottom:12px">
+   <div class="row">
+     <span class="small">행성</span>
+     <span id="t3Planets" class="row"></span>
+     <span class="small" style="margin-left:8px">경로 기간</span>
+     <select id="selWin">
+       <option value="30">30일</option>
+       <option value="90">90일</option>
+       <option value="180" selected>180일</option>
+       <option value="365">365일</option>
+       <option value="600">600일</option>
+       <option value="900">900일</option>
+     </select>
+     <button class="sm" id="btnRetro">역행 순간으로 이동</button>
+     <button class="sm" id="btnSyn+">+1 회합주기</button>
+     <button class="sm" id="btnSyn-">-1 회합주기</button>
+   </div>
+ </div>
+ <div class="grid2e">
+  <div class="card">
+    <h2>위에서 본 태양계</h2>
+    <canvas id="cvTop" data-ar="1"></canvas>
+    <div class="small" id="t3TopNote" style="margin-top:6px"></div>
+  </div>
+  <div class="card">
+    <h2>천구상의 경로 (적경 · 적위)</h2>
+    <canvas id="cvPath" data-ar="0.8"></canvas>
+    <div class="legend">
+      <span><i style="background:#7ee787"></i>순행 (적경 증가, 서 → 동)</span>
+      <span><i style="background:#ff8a7a"></i>역행 (적경 감소, 동 → 서)</span>
+      <span><i style="background:#ffd479"></i>유</span>
+      <span><i style="background:#5b6b8c"></i>황도</span>
+    </div>
+  </div>
+ </div>
+ <div class="card" style="margin-top:12px">
+   <div class="kv" style="grid-template-columns:auto 1fr auto 1fr">
+     <b>위치 관계</b><span id="k3cfg">-</span>
+     <b>이각 (elongation)</b><span id="k3el">-</span>
+     <b>겉보기 운동</b><span id="k3mot">-</span>
+     <b>적경 변화율 dα/dt</b><span id="k3rate">-</span>
+     <b>지구와의 거리</b><span id="k3d">-</span>
+     <b>시지름 (apparent diameter)</b><span id="k3ad">-</span>
+     <b>조명 비율 k</b><span id="k3k">-</span>
+     <b>회합주기 (synodic period)</b><span id="k3syn">-</span>
+     <b>적경 (RA)</b><span id="k3ra">-</span>
+     <b>적위 (Dec)</b><span id="k3dec">-</span>
+   </div>
+   <div id="k3msg" class="small" style="margin-top:8px"></div>
+ </div>
+ <div class="note" style="margin-top:12px">
+   <b>역행이 일어나는 까닭</b><br>
+   지구와 행성은 <b>같은 방향</b>으로 태양 둘레를 돌지만 공전 속도가 다릅니다. 그래서 지구에서 본 시선 방향이
+   때때로 되돌아가고, 배경 별에 대한 행성의 위치가 <b>동 → 서</b> 로 밀립니다. 왼쪽 그림의 시선을 따라가며
+   오른쪽 경로가 어느 순간 되돌아가는지 확인하세요. 되돌아가는 순간이 <b>유 (stationary)</b> 입니다.
+ </div>
+</section>
+
+<!-- ================= TAB 4 ================= -->
+<section class="tabpanel" id="tab4" hidden>
+ <div class="card" style="margin-bottom:12px">
+   <div class="row">
+     <button class="sm on" data-kind="inner">내행성 (inferior planet)</button>
+     <button class="sm" data-kind="outer">외행성 (superior planet)</button>
+     <span id="t4Planets" class="row" style="margin-left:8px"></span>
+   </div>
+   <div class="row" style="margin-top:8px" id="t4Cfg"></div>
+ </div>
+ <div class="grid2">
+  <div class="card">
+    <h2>궤도와 위치 관계</h2>
+    <canvas id="cvOrbit" data-ar="0.95"></canvas>
+    <div class="small" style="margin-top:6px">행성을 끌어서 궤도 위를 움직여 보세요. 시각이 함께 바뀝니다.</div>
+    <div id="t4ElongNote" class="small" style="margin-top:6px"></div>
+  </div>
+  <div>
+    <div class="card">
+      <h2>지구에서 본 모습 (위상 · 시지름)</h2>
+      <canvas id="cvPhase" data-ar="0.72"></canvas>
+      <div class="kv" style="margin-top:8px">
+        <b>위치 관계</b><span id="k4cfg">-</span>
+        <b>이각 (elongation)</b><span id="k4el">-</span>
+        <b>위상각 (phase angle)</b><span id="k4ph">-</span>
+        <b>조명 비율 k</b><span id="k4k">-</span>
+        <b>시지름 (apparent diameter)</b><span id="k4ad">-</span>
+        <b>지구와의 거리</b><span id="k4d">-</span>
+      </div>
+    </div>
+    <div class="card" style="margin-top:12px">
+      <h2>관측 가능 시간</h2>
+      <div class="eq" id="k4eq">관측 가능 시간 = 이각 / 15도 per hour</div>
+      <div class="kv" style="margin-top:6px">
+        <b>계산값 (이각 / 15)</b><span id="k4obs">-</span>
+        <b>언제</b><span id="k4when">-</span>
+        <b>어느 쪽 하늘</b><span id="k4where">-</span>
+        <b>지평선 위 + 박명 고려</b><span id="k4real">-</span>
+      </div>
+      <div id="k4why" class="small" style="margin-top:7px"></div>
+    </div>
+  </div>
+ </div>
+ <div class="card" style="margin-top:12px">
+   <h2>하늘에서의 위치</h2>
+   <div class="ctl">
+     <label for="sSkyH">관측 시각</label>
+     <input type="range" id="sSkyH" min="0" max="1439" step="5" value="1140">
+     <div class="val" id="vSkyH">-</div>
+   </div>
+   <canvas id="cvHorizon" data-ar="0.42"></canvas>
+   <div class="legend">
+     <span><i style="background:#ffd479"></i>태양</span>
+     <span><i style="background:#ff9f7a"></i>행성</span>
+     <span><i style="background:#7ee787"></i>지평선</span>
+   </div>
+   <div id="k4sky" class="small" style="margin-top:6px"></div>
+ </div>
+ <div class="card" style="margin-top:12px">
+   <h2>위상 변화 순서</h2>
+   <div class="row" style="margin-bottom:8px">
+     <button class="sm on" id="btnStripEven">균등 간격</button>
+     <button class="sm" id="btnStripCfg">주요 위치 관계</button>
+     <span class="small">썸네일을 누르면 그 위치로 이동합니다.</span>
+   </div>
+   <div class="strip" id="t4Strip"></div>
+   <div id="t4StripNote" class="small" style="margin-top:8px"></div>
+ </div>
+</section>
+
+<!-- ================= TAB 5 ================= -->
+<section class="tabpanel" id="tab5" hidden>
+ <div class="row" style="margin-bottom:12px">
+   <button class="sm on" data-sub="a">5a. 학습지 문항</button>
+   <button class="sm" data-sub="b">5b. 랜덤 자가 점검</button>
+ </div>
+ <div id="sub5a">
+   <div class="note">각 문항의 <b>시뮬레이터로 확인</b> 을 누르면 관련 탭이 열리고 그 문항의 답이 보이는 상태로 모든 조절값이 맞춰집니다. 해설은 그 상태에서 다시 계산한 값으로 씁니다.</div>
+   <div id="qList"></div>
+ </div>
+ <div id="sub5b" hidden>
+   <div class="card" style="margin-bottom:12px">
+     <div class="row">
+       <button id="btnNewQ">새 문제</button>
+       <span class="tag" id="scoreTag">0 / 0</span>
+       <span class="small">문제는 그때그때 계산해서 만들기 때문에 매번 값이 다릅니다.</span>
+     </div>
+     <div class="hr"></div>
+     <div id="qBreak" class="small"></div>
+   </div>
+   <div id="qBox"></div>
+ </div>
+</section>
+
+<div id="verify" hidden>
+  <div class="row" style="justify-content:space-between;margin-bottom:8px">
+    <h2 style="margin:0">자체 검증 (self-verification)</h2>
+    <button class="sm" id="btnVClose">닫기</button>
+  </div>
+  <div id="vSummary"></div>
+  <div style="overflow-x:auto"><table class="vt" id="vTable"></table></div>
+</div>
+</div>
+<script>
+/* =====================================================================
+   ENGINE  천문 계산 엔진 (순수 함수, DOM 접근 없음)
+   모든 각도는 별도 표시가 없으면 "도(degree)" 단위.
+   ===================================================================== */
+
+const DEG = Math.PI / 180;
+const RAD = 180 / Math.PI;
+const OBLIQUITY = 23.44;            // 황도경사각 epsilon
+const AU_KM = 1.495978707e8;
+const TROPICAL_YEAR = 365.2422;     // 회귀년 (일)
+
+/* 삼각함수 도(degree) 래퍼 */
+const sind = a => Math.sin(a * DEG);
+const cosd = a => Math.cos(a * DEG);
+const tand = a => Math.tan(a * DEG);
+const asind = x => Math.asin(Math.max(-1, Math.min(1, x))) * RAD;
+const acosd = x => Math.acos(Math.max(-1, Math.min(1, x))) * RAD;
+const atan2d = (y, x) => Math.atan2(y, x) * RAD;
+
+function norm360(x) { x = x % 360; return x < 0 ? x + 360 : x; }
+function norm180(x) { x = norm360(x); return x > 180 ? x - 360 : x; }   // (-180, 180]
+function norm24(x) { x = x % 24; return x < 0 ? x + 24 : x; }
+
+/* ---------------------------------------------------------------------
+   천체 상수
+   a    : 궤도 반지름 (AU, 원궤도 근사)
+   T    : 공전주기 (년)
+   i    : 궤도경사 (도, 황도면 기준)
+   node : 승교점 황경 Omega (도)
+   R    : 반지름 (km)
+   L0   : 평균황경 (도) at epoch n = 0.5  (= JD 2451545.0, J2000.0)
+   --------------------------------------------------------------------- */
+const BODIES = {
+  mercury: { ko: '수성', en: 'Mercury', a: 0.3871, T: 0.2408, i: 7.00, node: 48.3,  R: 2440,  L0: 252.25084, kind: 'inner', color: '#c8b6a0' },
+  venus:   { ko: '금성', en: 'Venus',   a: 0.7233, T: 0.6152, i: 3.39, node: 76.7,  R: 6052,  L0: 181.97973, kind: 'inner', color: '#f0d27a' },
+  earth:   { ko: '지구', en: 'Earth',   a: 1.0000, T: 1.0000, i: 0.00, node: 0.0,   R: 6371,  L0: 0, kind: 'earth', color: '#5aa9e6' },
+  mars:    { ko: '화성', en: 'Mars',    a: 1.5237, T: 1.8808, i: 1.85, node: 49.6,  R: 3390,  L0: 355.45332, kind: 'outer', color: '#e2725b' },
+  jupiter: { ko: '목성', en: 'Jupiter', a: 5.2026, T: 11.862, i: 1.30, node: 100.5, R: 69911, L0: 34.40438,  kind: 'outer', color: '#d8b384' },
+  saturn:  { ko: '토성', en: 'Saturn',  a: 9.5549, T: 29.457, i: 2.49, node: 113.7, R: 58232, L0: 49.94432,  kind: 'outer', color: '#e3d6a8' },
+};
+const EPOCH_N = 0.5;   // J2000.0 을 "일수 n" 으로 표현한 값
+
+
+
+/* ---------------------------------------------------------------------
+   달력  <->  일수 n   (n = 0  <=>  2000-01-01 00:00,  n = JD - 2451544.5)
+   --------------------------------------------------------------------- */
+function jdFromYMD(y, m, d) {           // d 는 소수 가능, 그레고리력
+  if (m <= 2) { y -= 1; m += 12; }
+  const A = Math.floor(y / 100), B = 2 - A + Math.floor(A / 4);
+  return Math.floor(365.25 * (y + 4716)) + Math.floor(30.6001 * (m + 1)) + d + B - 1524.5;
+}
+function ymdFromJD(jd) {
+  const z = Math.floor(jd + 0.5), f = jd + 0.5 - z;
+  let A = z;
+  if (z >= 2299161) { const a = Math.floor((z - 1867216.25) / 36524.25); A = z + 1 + a - Math.floor(a / 4); }
+  const B = A + 1524, C = Math.floor((B - 122.1) / 365.25), D = Math.floor(365.25 * C), E = Math.floor((B - D) / 30.6001);
+  const day = B - D - Math.floor(30.6001 * E) + f;
+  const month = (E < 14) ? E - 1 : E - 13;
+  const year = (month > 2) ? C - 4716 : C - 4715;
+  return { y: year, m: month, d: day };
+}
+const nFromYMD = (y, m, d) => jdFromYMD(y, m, d) - 2451544.5;
+const ymdFromN = n => ymdFromJD(n + 2451544.5);
+
+function dayOfYear(n) {
+  const c = ymdFromN(n);
+  return Math.floor(n) - Math.floor(nFromYMD(c.y, 1, 1)) + 1;
+}
+function daysInYear(y) { return nFromYMD(y + 1, 1, 1) - nFromYMD(y, 1, 1); }
+
+function koDate(n) {
+  const c = ymdFromN(n);
+  return c.y + '년 ' + c.m + '월 ' + Math.floor(c.d) + '일';
+}
+function koDateShort(n) { const c = ymdFromN(n); return c.m + '/' + Math.floor(c.d); }
+
+function hourOf(n) { return norm24((n - Math.floor(n)) * 24); }   // 지방 태양시 (0 = 자정)
+function hmString(h) {
+  h = norm24(h);
+  const H = Math.floor(h), M = Math.round((h - H) * 60);
+  return (M === 60) ? norm24(H + 1).toFixed(0).padStart(2, '0') + ':00'
+                    : String(H).padStart(2, '0') + ':' + String(M).padStart(2, '0');
+}
+function durString(h) {
+  if (!isFinite(h)) return '-';
+  const H = Math.floor(h), M = Math.round((h - H) * 60);
+  return (M === 60) ? (H + 1) + '시간 0분' : H + '시간 ' + M + '분';
+}
+
+/* 지구의 L0 : 아래 SUN_ANCHOR 로부터 계산한다.
+
+   이 모형은 원궤도(이심률 무시)를 쓰므로 태양은 황도 위를 하루 0.98565 도씩
+   "균일하게" 움직인다. 실제 태양은 지구 궤도의 이심률(e = 0.0167) 때문에
+   이 균일 운동보다 최대 약 +-2 도(약 +-2일) 앞서거나 뒤진다. 학습지 범위 밖이라
+   이심률은 다루지 않는다.
+
+   그 대신 기준점(태양 황경 = 0, 즉 춘분)을 네 절기의 오차가 고르게 퍼지도록 잡아
+   춘분이 3월 21일, 하지가 6월 21일에 오도록 맞추었다. 이 근사 때문에 모형의
+   추분은 9월 20일경, 동지는 12월 20일경으로 실제보다 2 ~ 3일 이르다.
+   특정 날짜의 태양 적위 오차는 최대 약 0.8 도, 낮의 길이 오차는 최대 약 8분이다.
+   절기 그 자체(황경 0 / 90 / 180 / 270 도)에서의 적경, 적위, 낮의 길이는 정확하다. */
+const SUN_ANCHOR_YMD = [2026, 3, 21.95];        // 이 순간에 태양 황경 = 0 (춘분)
+BODIES.earth.L0 = norm360(180 - (360 / TROPICAL_YEAR) *
+    (jdFromYMD(SUN_ANCHOR_YMD[0], SUN_ANCHOR_YMD[1], SUN_ANCHOR_YMD[2]) - 2451544.5 - EPOCH_N));
+
+/* ---------------------------------------------------------------------
+   황도좌표 -> 적도좌표
+   --------------------------------------------------------------------- */
+function eclToEq(lam, beta) {
+  const e = OBLIQUITY;
+  const dec = asind(sind(beta) * cosd(e) + cosd(beta) * sind(e) * sind(lam));
+  const ra = norm360(atan2d(sind(lam) * cosd(e) - tand(beta) * sind(e), cosd(lam)));
+  return { ra: ra, dec: dec, raH: ra / 15 };
+}
+function eqToEcl(ra, dec) {
+  const e = OBLIQUITY;
+  const beta = asind(sind(dec) * cosd(e) - cosd(dec) * sind(e) * sind(ra));
+  const lam = norm360(atan2d(sind(ra) * cosd(e) + tand(dec) * sind(e), cosd(ra)));
+  return { lam: lam, beta: beta };
+}
+
+/* ---------------------------------------------------------------------
+   일심 위치 (황도 직교좌표, AU)
+   x 축은 춘분점 방향, z 축은 황도북극
+   --------------------------------------------------------------------- */
+function meanLongitude(key, n) {
+  const b = BODIES[key];
+  return norm360(b.L0 + 360 * (n - EPOCH_N) / (b.T * TROPICAL_YEAR));
+}
+function heliocentric(key, n) {
+  const b = BODIES[key];
+  const th = meanLongitude(key, n);          // theta = 평균황경
+  const u = th - b.node;                     // u = 승교점에서 잰 이각
+  const O = b.node, i = b.i;
+  return {
+    x: b.a * (cosd(O) * cosd(u) - sind(O) * sind(u) * cosd(i)),
+    y: b.a * (sind(O) * cosd(u) + cosd(O) * sind(u) * cosd(i)),
+    z: b.a * (sind(u) * sind(i)),
+    theta: th
+  };
+}
+
+/* ---------------------------------------------------------------------
+   태양 (지구 중심에서 본 위치)
+   --------------------------------------------------------------------- */
+function sunEclLon(n) { return norm360(meanLongitude('earth', n) + 180); }
+function sunPos(n) {
+  const lam = sunEclLon(n);
+  const eq = eclToEq(lam, 0);
+  return { lam: lam, beta: 0, ra: eq.ra, dec: eq.dec, raH: eq.raH, d: 1 };
+}
+/* 태양 황경이 특정 값이 되는 n 을 구한다 (절기 계산용) */
+function nOfSunLon(targetLam, nNear) {
+  const rate = 360 / TROPICAL_YEAR;
+  const cur = sunEclLon(nNear);
+  return nNear + norm180(targetLam - cur) / rate;
+}
+
+/* ---------------------------------------------------------------------
+   지방 항성시 / 시간각
+   이 시뮬레이터의 시계는 "지방 태양시" 이다.
+   태양시 정오에 태양이 남중하므로  LST = alpha_sun + 15 * (시각 - 12)
+   --------------------------------------------------------------------- */
+function lstDeg(n) { return norm360(sunPos(n).ra + 15 * (hourOf(n) - 12)); }
+function hourAngle(n, ra) { return norm180(lstDeg(n) - ra); }
+/* 어떤 천체가 남중(H=0)하는 지방 태양시 */
+function transitLT(n, ra) { return norm24(12 + norm180(ra - sunPos(n).ra) / 15); }
+
+/* ---------------------------------------------------------------------
+   지평좌표
+   방위각 A : 북점에서 시계방향 (N -> E -> S -> W)
+   고도 h, 천정거리 Z = 90 - h
+   --------------------------------------------------------------------- */
+/* 지평좌표계 직교 성분 (E 동, N 북, U 천정). tan(dec) 특이점이 없는 형태 */
+function horizonVec(H, dec, lat) {
+  return {
+    E: -cosd(dec) * sind(H),
+    N: sind(dec) * cosd(lat) - cosd(dec) * cosd(H) * sind(lat),
+    U: sind(dec) * sind(lat) + cosd(dec) * cosd(lat) * cosd(H)
+  };
+}
+function altaz(H, dec, lat) {
+  const v = horizonVec(H, dec, lat);
+  const h = asind(v.U);
+  return { A: norm360(atan2d(v.E, v.N)), h: h, Z: 90 - h, vec: v };
+}
+/* 학습지에 실린 식 그대로 (검증용 독립 구현) */
+function altazFormula(H, dec, lat) {
+  const h = asind(sind(dec) * sind(lat) + cosd(dec) * cosd(lat) * cosd(H));
+  const A = norm360(atan2d(sind(H), cosd(H) * sind(lat) - tand(dec) * cosd(lat)) + 180);
+  return { A: A, h: h, Z: 90 - h };
+}
+/* 지평좌표 -> 시간각/적위 (구면 위 클릭으로 별을 놓을 때 사용) */
+function vecToHourDec(E, N, U, lat) {
+  const dec = asind(U * sind(lat) + N * cosd(lat));
+  const H = norm180(atan2d(-E, U * cosd(lat) - N * sind(lat)));
+  return { H: H, dec: dec };
+}
+
+/* ---------------------------------------------------------------------
+   출몰 / 주극성 판정
+   --------------------------------------------------------------------- */
+function riseInfo(lat, dec) {
+  const c = -tand(lat) * tand(dec);
+  if (Math.abs(lat) >= 89.999) {
+    const up = (dec * lat > 0);
+    return { type: up ? 'circumpolar' : 'never', H0: up ? 180 : 0, hours: up ? 24 : 0 };
+  }
+  if (c <= -1) return { type: 'circumpolar', H0: 180, hours: 24 };   // 주극성
+  if (c >= 1)  return { type: 'never', H0: 0, hours: 0 };            // 전몰성
+  const H0 = acosd(c);
+  return { type: 'rise', H0: H0, hours: 2 * H0 / 15 };               // 출몰성
+}
+const STAR_TYPE_KO = { circumpolar: '주극성', rise: '출몰성', never: '전몰성' };
+function starTypeKo(lat, dec) { return STAR_TYPE_KO[riseInfo(lat, dec).type]; }
+/* 현재 위도에서의 적위 경계 */
+function decBoundaries(lat) {
+  const b = 90 - Math.abs(lat);
+  return lat >= 0 ? { circumpolar: b, never: -b } : { circumpolar: -b, never: b };
+}
+/* 일주권이 지평선과 이루는 각 */
+function diurnalTiltDeg(lat) { return 90 - Math.abs(lat); }
+
+/* ---------------------------------------------------------------------
+   지구 중심에서 본 행성 (겉보기 값)
+   --------------------------------------------------------------------- */
+function geo(key, n) {
+  const b = BODIES[key];
+  const p = heliocentric(key, n);
+  const e = heliocentric('earth', n);
+  const gx = p.x - e.x, gy = p.y - e.y, gz = p.z - e.z;
+  const d = Math.sqrt(gx * gx + gy * gy + gz * gz);                 // 지구와의 거리 (AU)
+  const lam = norm360(atan2d(gy, gx));                              // 황경
+  const beta = asind(gz / d);                                       // 황위
+  const eq = eclToEq(lam, beta);
+  const s = sunPos(n);
+
+  /* 이각 : 지구에서 본 태양 방향과 행성 방향 사이의 각 */
+  const sunVec = { x: -e.x, y: -e.y, z: -e.z };
+  const rSun = Math.sqrt(sunVec.x ** 2 + sunVec.y ** 2 + sunVec.z ** 2);
+  const cosE = (sunVec.x * gx + sunVec.y * gy + sunVec.z * gz) / (rSun * d);
+  const elong = acosd(cosE);
+  const signed = norm180(lam - s.lam);            // + 이면 동방, - 이면 서방
+  const dir = Math.abs(signed) < 1e-9 ? '' : (signed > 0 ? '동방' : '서방');
+
+  /* 위상각 : 태양 - 행성 - 지구 사이의 각 */
+  const rp = Math.sqrt(p.x ** 2 + p.y ** 2 + p.z ** 2);
+  const ps = { x: -p.x, y: -p.y, z: -p.z };                          // 행성 -> 태양
+  const pe = { x: e.x - p.x, y: e.y - p.y, z: e.z - p.z };           // 행성 -> 지구
+  const cosI = (ps.x * pe.x + ps.y * pe.y + ps.z * pe.z) / (rp * d);
+  const phase = acosd(cosI);
+  const k = (1 + cosd(phase)) / 2;                                   // 조명 비율
+
+  const angDiam = 2 * Math.atan(b.R / (d * AU_KM)) * 206264.806;     // 시지름 (초)
+
+  return {
+    key: key, n: n, hel: p, earth: e,
+    gx: gx, gy: gy, gz: gz, d: d, rp: rp,
+    lam: lam, beta: beta, ra: eq.ra, raH: eq.raH, dec: eq.dec,
+    elong: elong, signedElong: signed, dir: dir,
+    phase: phase, k: k, angDiam: angDiam,
+    sun: s
+  };
+}
+
+/* 이각을 화면에 쓸 때의 표기. 충 부근에서는 동방 서방 구분이 뜻이 없으므로 방향을 빼고 쓴다 */
+function elongText(g, digits) {
+  const d = (digits === undefined) ? 2 : digits;
+  return ((g.elong > 170 || !g.dir) ? '' : g.dir + ' ') + g.elong.toFixed(d) + '도';
+}
+
+/* 회합주기 (일) */
+function synodicDays(key) {
+  const b = BODIES[key];
+  return Math.abs(1 / (1 / b.T - 1 / 1.0)) * TROPICAL_YEAR;
+}
+/* 내행성 최대이각 (원궤도) :  sin(최대이각) = a_행성 / a_지구 */
+function maxElongation(key) {
+  const b = BODIES[key];
+  return b.kind === 'inner' ? asind(b.a / BODIES.earth.a) : null;
+}
+/* 외행성 최대 위상각 :  sin(i_max) = a_지구 / a_행성 */
+function maxPhaseAngle(key) {
+  const b = BODIES[key];
+  return b.kind === 'outer' ? asind(BODIES.earth.a / b.a) : 180;
+}
+function minIllumination(key) {
+  const b = BODIES[key];
+  return b.kind === 'outer' ? (1 + cosd(maxPhaseAngle(key))) / 2 : 0;
+}
+
+/* ---------------------------------------------------------------------
+   위치 관계 (내합/외합/최대이각, 합/충/동구/서구)
+   상대 위치각으로 판정한다.
+     내행성 rel = theta_행성 - theta_지구  :  0 = 내합, 180 = 외합
+     외행성 rel = theta_지구 - theta_행성  :  0 = 충,   180 = 합
+   --------------------------------------------------------------------- */
+function relAngle(key, n) {
+  const tp = meanLongitude(key, n), te = meanLongitude('earth', n);
+  return BODIES[key].kind === 'inner' ? norm360(tp - te) : norm360(te - tp);
+}
+/* 각 위치 관계에 해당하는 rel 값 */
+function configAngles(key) {
+  const b = BODIES[key];
+  if (b.kind === 'inner') {
+    const relMax = acosd(b.a / BODIES.earth.a);   // 최대이각일 때 태양에서 본 지구-행성 각
+    return [
+      { rel: 0,            name: '내합',        short: '내합' },
+      { rel: relMax,       name: '서방최대이각', short: '서방최대이각' },
+      { rel: 180,          name: '외합',        short: '외합' },
+      { rel: 360 - relMax, name: '동방최대이각', short: '동방최대이각' },
+    ];
+  }
+  const relQ = acosd(BODIES.earth.a / b.a);       // 구(quadrature) 일 때 태양에서 본 각
+  return [
+    { rel: 0,          name: '충',   short: '충' },
+    { rel: relQ,       name: '동구', short: '동구' },
+    { rel: 180,        name: '합',   short: '합' },
+    { rel: 360 - relQ, name: '서구', short: '서구' },
+  ];
+}
+/* 현재 rel 에서 가장 가까운 위치 관계 이름 */
+function configAt(key, n, tolDeg) {
+  tolDeg = (tolDeg === undefined) ? 2.5 : tolDeg;
+  const rel = relAngle(key, n);
+  const list = configAngles(key);
+  let best = null, bestD = 1e9;
+  for (const c of list) {
+    const d = Math.abs(norm180(rel - c.rel));
+    if (d < bestD) { bestD = d; best = c; }
+  }
+  let label;
+  if (bestD <= tolDeg) label = best.name;
+  else if (bestD <= 20) label = best.name + ' 부근';
+  else {
+    /* 어느 위치 관계에도 가깝지 않으면 사이에 낀 두 개의 이름으로 부른다 */
+    const sorted = list.slice().sort((a, b) => a.rel - b.rel);
+    let prev = sorted[sorted.length - 1], next = sorted[0];
+    for (let i = 0; i < sorted.length; i++) if (sorted[i].rel <= rel) prev = sorted[i];
+    for (let i = sorted.length - 1; i >= 0; i--) if (sorted[i].rel >= rel) next = sorted[i];
+    label = prev.name + ' ~ ' + next.name + ' 사이';
+  }
+  return { rel: rel, name: best.name, exact: bestD <= tolDeg, delta: bestD, label: label };
+}
+/* rel 값이 target 이 되는 가장 가까운 시각 */
+function nOfRel(key, target, nNear) {
+  const b = BODIES[key];
+  const rate = 360 / synodicDays(key) * (b.kind === 'inner' ? 1 : 1);
+  let n = nNear + norm180(target - relAngle(key, nNear)) / rate;
+  for (let it = 0; it < 40; it++) {                    // 뉴턴 보정
+    const f = norm180(relAngle(key, n) - target);
+    if (Math.abs(f) < 1e-9) break;
+    n -= f / rate;
+  }
+  return n;
+}
+
+/* ---------------------------------------------------------------------
+   적경 변화율 (순행 / 역행 / 유)
+   dRA/dt > 0 : 순행 (서 -> 동, 적경 증가)
+   dRA/dt < 0 : 역행 (동 -> 서, 적경 감소)
+   --------------------------------------------------------------------- */
+function raRate(key, n, dt) {                 // 도/일
+  dt = dt || 0.5;
+  const a1 = geo(key, n - dt).ra, a2 = geo(key, n + dt).ra;
+  return norm180(a2 - a1) / (2 * dt);
+}
+const raRateArcsec = (key, n, dt) => raRate(key, n, dt) * 3600;   // 초(각)/일
+function motionKo(key, n) {
+  const r = raRate(key, n);
+  if (Math.abs(r) < 1e-4) return '유';
+  return r > 0 ? '순행' : '역행';
+}
+/* [n0, n1] 구간의 역행 구간들을 찾는다 */
+function retrogradeIntervals(key, n0, n1, step) {
+  step = step || 1;
+  const out = [];
+  let prev = raRate(key, n0), prevN = n0, start = prev < 0 ? n0 : null;
+  for (let n = n0 + step; n <= n1 + 1e-9; n += step) {
+    const cur = raRate(key, n);
+    if (prev >= 0 && cur < 0) start = refineZero(key, prevN, n);
+    else if (prev < 0 && cur >= 0) { out.push({ start: start === null ? n0 : start, end: refineZero(key, prevN, n) }); start = null; }
+    prev = cur; prevN = n;
+  }
+  if (start !== null) out.push({ start: start, end: n1 });
+  return out;
+}
+function refineZero(key, na, nb) {                    // 이분법으로 유(dRA/dt = 0) 시각
+  let fa = raRate(key, na);
+  for (let it = 0; it < 60; it++) {
+    const nm = (na + nb) / 2, fm = raRate(key, nm);
+    if ((fa < 0) === (fm < 0)) { na = nm; fa = fm; } else { nb = nm; }
+  }
+  return (na + nb) / 2;
+}
+/* 현재 시각에서 가장 가까운 역행 구간 */
+function nearestRetrograde(key, n) {
+  const S = synodicDays(key);
+  const list = retrogradeIntervals(key, n - 1.2 * S, n + 1.2 * S, Math.max(0.5, S / 400));
+  if (!list.length) return null;
+  let best = list[0], bd = 1e9;
+  for (const iv of list) {
+    const mid = (iv.start + iv.end) / 2, d = Math.abs(mid - n);
+    if (d < bd) { bd = d; best = iv; }
+  }
+  return best;
+}
+
+/* ---------------------------------------------------------------------
+   관측 시간 / 하늘에서의 위치
+   --------------------------------------------------------------------- */
+/* 학습지 규칙 : 관측 가능 시간 = 이각 / 15도 per hour */
+function observingHours(elongDeg) { return elongDeg / 15; }
+
+/* 어느 쪽 하늘에서 언제 보이는가 (이각의 부호와 크기로 결정) */
+function visibilityKo(key, n) {
+  const g = geo(key, n);
+  const e = Math.abs(g.signedElong);
+  const kind = BODIES[key].kind;
+  const cfg = configAt(key, n, 3);
+  if (e < 8) return { when: '관측 불가', where: '-', why: '태양과 같은 방향에 있어 태양빛에 묻힌다', cfg: cfg };
+  if (kind === 'inner') {
+    return g.signedElong > 0
+      ? { when: '초저녁', where: '서쪽 하늘', why: '태양보다 동쪽에 있어 태양이 진 뒤에 진다', cfg: cfg }
+      : { when: '새벽',   where: '동쪽 하늘', why: '태양보다 서쪽에 있어 태양보다 먼저 뜬다', cfg: cfg };
+  }
+  if (e > 172) return { when: '초저녁 ~ 새벽 (밤새)', where: '동 -> 남 -> 서', why: '태양 반대쪽이라 해질 때 뜨고 자정에 남중, 해뜰 때 진다', cfg: cfg };
+  return g.signedElong > 0
+    ? { when: '초저녁 ~ 자정', where: '남쪽 ~ 서쪽 하늘', why: '태양보다 동쪽에 있어 해질 때 남중하고 자정에 진다', cfg: cfg }
+    : { when: '자정 ~ 새벽',   where: '동쪽 ~ 남쪽 하늘', why: '태양보다 서쪽에 있어 자정에 뜨고 해뜰 때 남중한다', cfg: cfg };
+}
+
+/* 뜨는 시각 / 남중 시각 / 지는 시각 (지방 태양시) */
+function riseTransitSet(n, ra, dec, lat) {
+  const tr = transitLT(n, ra);
+  const ri = riseInfo(lat, dec);
+  if (ri.type !== 'rise') return { transit: tr, rise: null, set: null, type: ri.type, up: ri.hours };
+  return { transit: tr, rise: norm24(tr - ri.H0 / 15), set: norm24(tr + ri.H0 / 15), type: 'rise', up: ri.hours };
+}
+
+/* 실제로 지평선 위 + 박명(태양 고도 -6도)을 고려한 관측 가능 시간 (일 단위 스캔) */
+function observableWindow(key, n, lat, sunAltLimit) {
+  sunAltLimit = (sunAltLimit === undefined) ? -6 : sunAltLimit;
+  const day0 = Math.floor(n);
+  let count = 0; const stepH = 2 / 60;                 // 2분 간격
+  let segs = [], cur = null;
+  for (let h = 0; h < 24; h += stepH) {
+    const nn = day0 + h / 24;
+    const s = sunPos(nn);
+    const sunH = altaz(hourAngle(nn, s.ra), s.dec, lat).h;
+    const g = geo(key, nn);
+    const pH = altaz(hourAngle(nn, g.ra), g.dec, lat).h;
+    const ok = (sunH < sunAltLimit) && (pH > 0);
+    if (ok) { count++; if (!cur) cur = { from: h, to: h }; else cur.to = h; }
+    else if (cur) { segs.push(cur); cur = null; }
+  }
+  if (cur) segs.push(cur);
+  return { hours: count * stepH, segments: segs };
+}
+
+/* ---------------------------------------------------------------------
+   낮 / 밤의 길이
+   --------------------------------------------------------------------- */
+function dayLength(n, lat) {
+  const s = sunPos(n);
+  const r = riseInfo(lat, s.dec);
+  return { day: r.hours, night: 24 - r.hours, dec: s.dec, ra: s.ra, raH: s.raH, lam: s.lam, type: r.type };
+}
+/* =====================================================================
+   검증 (self-verification)
+   기대값은 표시 경로에 박아 넣지 않고, 엔진 함수로부터 다시 계산해서 비교한다.
+   ===================================================================== */
+function mulberry32(seed) {
+  return function () {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function verifyAll() {
+  const rows = [];
+  const add = (name, expected, actual, ok, note) =>
+    rows.push({ name: name, expected: expected, actual: actual, pass: !!ok, note: note || '' });
+  const near = (a, b, tol) => Math.abs(a - b) <= tol;
+  const f = (x, d) => (Math.round(x * Math.pow(10, d)) / Math.pow(10, d)).toFixed(d);
+
+  /* ---- 기준 시각 : 2026년 초 ---- */
+  const n0 = nFromYMD(2026, 1, 1);
+
+  /* 1-2. 최대이각 = asin(a행성 / a지구) */
+  const eV = maxElongation('venus'), eM = maxElongation('mercury');
+  add('금성 최대이각', '46.3 도 (오차 0.2)', f(eV, 3) + ' 도', near(eV, 46.3, 0.2), 'sin(최대이각) = 0.7233 / 1');
+  add('수성 최대이각', '22.8 도 (오차 0.2)', f(eM, 3) + ' 도', near(eM, 22.8, 0.2), 'sin(최대이각) = 0.3871 / 1');
+
+  /* 최대이각을 수치적으로도 확인 (회합주기 한 바퀴 스캔) */
+  for (const k of ['mercury', 'venus']) {
+    let mx = 0, S = synodicDays(k);
+    for (let n = n0; n < n0 + S; n += S / 4000) mx = Math.max(mx, geo(k, n).elong);
+    add(BODIES[k].ko + ' 최대이각 (수치 스캔)', f(maxElongation(k), 2) + ' 도 (오차 0.3)', f(mx, 3) + ' 도',
+        near(mx, maxElongation(k), 0.3), '궤도경사 때문에 해석값보다 아주 조금 크다');
+  }
+
+  /* 3-5. 회합주기 */
+  const sV = synodicDays('venus'), sMa = synodicDays('mars'), sJ = synodicDays('jupiter');
+  add('금성 회합주기', '583.9 일 (오차 1)', f(sV, 2) + ' 일', near(sV, 583.9, 1), 'S = 1 / |1/T - 1/1|');
+  add('화성 회합주기', '779.9 일 (오차 2)', f(sMa, 2) + ' 일', near(sMa, 779.9, 2), '');
+  add('목성 회합주기', '398.9 일 (오차 2)', f(sJ, 2) + ' 일', near(sJ, 398.9, 2), '');
+
+  /* 회합주기 검증 : 한 회합주기 뒤 위치 관계가 되풀이되는가 */
+  for (const k of ['venus', 'mars']) {
+    const r1 = relAngle(k, n0), r2 = relAngle(k, n0 + synodicDays(k));
+    const dd = Math.abs(norm180(r2 - r1));
+    add(BODIES[k].ko + ' 회합주기 후 위치 관계 복귀', '차이 0 도 (오차 0.5)', f(dd, 4) + ' 도', dd <= 0.5, '');
+  }
+
+  /* 6. 태양 적경 증가율 (1년 평균) */
+  let tot = 0, prev = sunPos(n0).ra;
+  const NY = TROPICAL_YEAR;
+  for (let i = 1; i <= 3653; i++) {
+    const n = n0 + NY * i / 3653, cur = sunPos(n).ra;
+    tot += norm180(cur - prev); prev = cur;
+  }
+  const rateSun = tot / NY;
+  add('태양 적경 증가율 (연평균)', '0.986 도/일 (오차 0.01)', f(rateSun, 5) + ' 도/일', near(rateSun, 0.986, 0.01),
+      '= 360 / 365.2422, 하루 약 3분 56초');
+  add('태양 적경 변화 방향', '항상 증가 (서 -> 동)',
+      (function () { let bad = 0; for (let i = 0; i < 365; i++) { if (norm180(sunPos(n0 + i + 1).ra - sunPos(n0 + i).ra) <= 0) bad++; } return bad === 0 ? '365일 모두 증가' : bad + '일 감소'; })(),
+      (function () { let bad = 0; for (let i = 0; i < 365; i++) { if (norm180(sunPos(n0 + i + 1).ra - sunPos(n0 + i).ra) <= 0) bad++; } return bad === 0; })(),
+      '태양은 역행하지 않는다');
+
+  /* 7-8. 하지점 / 동지점  (황경 90도 / 270도 순간) */
+  const nSS = nOfSunLon(90, n0 + 172), nWS = nOfSunLon(270, n0 + 356);
+  const ss = sunPos(nSS), ws = sunPos(nWS);
+  add('하지 태양 (적경, 적위)', '(6.00 h, +23.44 도) 오차 0.05',
+      '(' + f(ss.raH, 4) + ' h, ' + f(ss.dec, 4) + ' 도)  ' + koDateShort(nSS),
+      near(ss.raH, 6, 0.05) && near(ss.dec, 23.44, 0.05), '황경 90도 순간');
+  add('동지 태양 (적경, 적위)', '(18.00 h, -23.44 도) 오차 0.05',
+      '(' + f(ws.raH, 4) + ' h, ' + f(ws.dec, 4) + ' 도)  ' + koDateShort(nWS),
+      near(ws.raH, 18, 0.05) && near(ws.dec, -23.44, 0.05), '황경 270도 순간');
+  const nVE = nOfSunLon(0, n0 + 80), nAE = nOfSunLon(180, n0 + 266);
+  const ve = sunPos(nVE), ae = sunPos(nAE);
+  add('춘분 태양 (적경, 적위)', '(0.00 h, 0.00 도) 오차 0.02',
+      '(' + f(norm180(ve.ra) / 15, 4) + ' h, ' + f(ve.dec, 4) + ' 도)  ' + koDateShort(nVE),
+      near(norm180(ve.ra) / 15, 0, 0.02) && near(ve.dec, 0, 0.02), '');
+  add('추분 태양 (적경, 적위)', '(12.00 h, 0.00 도) 오차 0.02',
+      '(' + f(ae.raH, 4) + ' h, ' + f(ae.dec, 4) + ' 도)  ' + koDateShort(nAE),
+      near(ae.raH, 12, 0.02) && near(ae.dec, 0, 0.02), '');
+
+  /* 9-10. 낮의 길이 (기하학적, 대기 굴절 제외) */
+  const dSS = dayLength(nSS, 37.5), dWS = dayLength(nWS, 37.5);
+  add('낮의 길이 (위도 37.5도, 하지)', '14시간 35분 (오차 3분)', durString(dSS.day),
+      near(dSS.day * 60, 14 * 60 + 35, 3), '기하학적, 대기 굴절 제외');
+  add('낮의 길이 (위도 37.5도, 동지)', '9시간 25분 (오차 3분)', durString(dWS.day),
+      near(dWS.day * 60, 9 * 60 + 25, 3), '');
+  add('춘분 낮 = 밤', '12시간 00분 (오차 1분)', durString(dayLength(nVE, 37.5).day),
+      near(dayLength(nVE, 37.5).day * 60, 720, 1), '');
+
+  /* 11. 주극성 경계 */
+  const bnd = decBoundaries(36.5);
+  add('주극성 경계 (위도 36.5도)', '적위 >= +53.5 도', '적위 >= ' + f(bnd.circumpolar, 3) + ' 도',
+      near(bnd.circumpolar, 53.5, 1e-6), '90 - 위도');
+  add('전몰성 경계 (위도 36.5도)', '적위 <= -53.5 도', '적위 <= ' + f(bnd.never, 3) + ' 도',
+      near(bnd.never, -53.5, 1e-6), '');
+  add('경계 바로 안팎 판정 (위도 36.5도)', '53.6 -> 주극성, 53.4 -> 출몰성',
+      starTypeKo(36.5, 53.6) + ' / ' + starTypeKo(36.5, 53.4),
+      starTypeKo(36.5, 53.6) === '주극성' && starTypeKo(36.5, 53.4) === '출몰성', '');
+
+  /* 12-14. 시지름과 거리 */
+  const nIC = nOfRel('venus', 0, n0 + 100), nSC = nOfRel('venus', 180, n0 + 100);
+  const gIC = geo('venus', nIC), gSC = geo('venus', nSC);
+  add('금성 시지름 (내합)', '약 60 초 (오차 3), 거리 약 0.28 AU',
+      f(gIC.angDiam, 2) + ' 초, ' + f(gIC.d, 4) + ' AU', near(gIC.angDiam, 60, 3) && near(gIC.d, 0.28, 0.02), '');
+  add('금성 시지름 (외합)', '약 10 초 (오차 1), 거리 약 1.72 AU',
+      f(gSC.angDiam, 2) + ' 초, ' + f(gSC.d, 4) + ' AU', near(gSC.angDiam, 10, 1) && near(gSC.d, 1.72, 0.02), '');
+  add('금성 시지름 비 (내합 / 외합)', '약 6.2 배 (오차 0.5)', f(gIC.angDiam / gSC.angDiam, 3) + ' 배',
+      near(gIC.angDiam / gSC.angDiam, 6.2, 0.5), '시지름은 가까울수록 크다');
+  const nOpp = nOfRel('mars', 0, n0 + 200), gOpp = geo('mars', nOpp);
+  add('화성 시지름 (충)', '약 18 초 (오차 2), 거리 약 0.52 AU',
+      f(gOpp.angDiam, 2) + ' 초, ' + f(gOpp.d, 4) + ' AU', near(gOpp.angDiam, 18, 2) && near(gOpp.d, 0.52, 0.03), '');
+
+  /* 15-16. 외행성 최대 위상각과 최소 조명 비율 */
+  for (const k of ['mars', 'jupiter']) {
+    const S = synodicDays(k);
+    let mx = 0, mn = 1;
+    for (let n = n0; n < n0 + S; n += S / 3000) { const g = geo(k, n); mx = Math.max(mx, g.phase); mn = Math.min(mn, g.k); }
+    const th = maxPhaseAngle(k), kmin = minIllumination(k);
+    add(BODIES[k].ko + ' 최대 위상각', f(th, 2) + ' 도 (오차 1)', f(mx, 3) + ' 도', near(mx, th, 1), 'sin(i) = a지구 / a행성');
+    add(BODIES[k].ko + ' 최소 조명 비율', f(kmin, 3) + ' (오차 0.01)', f(mn, 4), near(mn, kmin, 0.01),
+        '외행성은 초승달 모양이 될 수 없다');
+  }
+  add('화성 최대 위상각 해석값', '41 도 (오차 0.5)', f(maxPhaseAngle('mars'), 3) + ' 도', near(maxPhaseAngle('mars'), 41, 0.5), 'asin(1 / 1.5237)');
+  add('목성 최대 위상각 해석값', '11 도 (오차 0.5)', f(maxPhaseAngle('jupiter'), 3) + ' 도', near(maxPhaseAngle('jupiter'), 11, 0.5), 'asin(1 / 5.2026)');
+  add('내행성 위상 범위 (금성)', '조명 비율 0 ~ 1 전부', (function () {
+        let mn = 1, mx = 0, S = synodicDays('venus');
+        for (let n = n0; n < n0 + S; n += S / 2000) { const g = geo('venus', n); mn = Math.min(mn, g.k); mx = Math.max(mx, g.k); }
+        return f(mn, 3) + ' ~ ' + f(mx, 3);
+      })(), (function () {
+        let mn = 1, mx = 0, S = synodicDays('venus');
+        for (let n = n0; n < n0 + S; n += S / 2000) { const g = geo('venus', n); mn = Math.min(mn, g.k); mx = Math.max(mx, g.k); }
+        return mn < 0.02 && mx > 0.99;
+      })(), '내행성은 그믐 ~ 보름 모두 나타난다');
+
+  /* 17-20. 역행 */
+  function retroCheck(key, loDay, hiDay, cfgRel, cfgName) {
+    const S = synodicDays(key);
+    const ivs = retrogradeIntervals(key, n0, n0 + 3 * S, 1);
+    const ok = ivs.length >= 2;
+    const durs = ivs.map(v => v.end - v.start);
+    const dur = durs.reduce((a, b) => a + b, 0) / Math.max(1, durs.length);
+    add(BODIES[key].ko + ' 역행 지속', loDay + ' ~ ' + hiDay + ' 일',
+        f(dur, 2) + ' 일 (' + ivs.length + '회 평균)', ok && dur >= loDay && dur <= hiDay, '');
+    /* 역행 구간의 중심이 해당 위치 관계와 일치하는가 */
+    let worst = 0;
+    for (const iv of ivs) {
+      const mid = (iv.start + iv.end) / 2;
+      const nCfg = nOfRel(key, cfgRel, mid);
+      worst = Math.max(worst, Math.abs(nCfg - mid));
+    }
+    add(BODIES[key].ko + ' 역행 중심 = ' + cfgName, '차이 2일 이내', f(worst, 3) + ' 일',
+        worst <= 2, '역행 구간 한가운데가 ' + cfgName);
+    /* 대칭성 */
+    let asym = 0;
+    for (const iv of ivs) {
+      const mid = nOfRel(key, cfgRel, (iv.start + iv.end) / 2);
+      asym = Math.max(asym, Math.abs((mid - iv.start) - (iv.end - mid)));
+    }
+    add(BODIES[key].ko + ' 역행 대칭성', cfgName + ' 전후 차이 3일 이내', f(asym, 3) + ' 일', asym <= 3, '');
+  }
+  retroCheck('mars', 70, 80, 0, '충');
+  retroCheck('venus', 40, 44, 0, '내합');
+
+  /* 내행성 역행 중심에서 이각의 부호가 뒤집히는가 */
+  (function () {
+    const iv = nearestRetrograde('venus', n0 + 120);
+    const mid = (iv.start + iv.end) / 2;
+    const a = geo('venus', mid - 5).signedElong, b = geo('venus', mid + 5).signedElong;
+    const cfg = configAt('venus', mid, 3);
+    add('금성 역행 시 위치 관계', '내합 (이각 부호 반전)',
+        cfg.label + ' / 이각 ' + f(a, 2) + ' 도 -> ' + f(b, 2) + ' 도',
+        cfg.name === '내합' && (a * b < 0), '');
+  })();
+  (function () {
+    const iv = nearestRetrograde('mars', n0 + 200);
+    const mid = (iv.start + iv.end) / 2;
+    const g = geo('mars', mid);
+    const cfg = configAt('mars', mid, 3);
+    add('화성 역행 시 위치 관계', '충 (이각 약 180 도)',
+        cfg.label + ' / 이각 ' + f(g.elong, 2) + ' 도',
+        cfg.name === '충' && Math.abs(g.elong - 180) < 8, '');
+  })();
+  /* 역행 이외 구간은 순행 */
+  (function () {
+    const S = synodicDays('mars');
+    const ivs = retrogradeIntervals('mars', n0, n0 + S, 1);
+    let bad = 0, tot2 = 0;
+    for (let n = n0; n < n0 + S; n += 2) {
+      const inRetro = ivs.some(v => n >= v.start && n <= v.end);
+      const r = raRate('mars', n); tot2++;
+      if (inRetro && r > 0) bad++;
+      if (!inRetro && r < 0) bad++;
+    }
+    add('순행 / 역행 분류 일관성', '불일치 0 건', bad + ' / ' + tot2 + ' 건', bad === 0, 'dRA/dt 부호로만 판정');
+  })();
+  /* 역행 폭 (loop) 이 궤도경사 때문에 적위 방향으로도 벌어지는가 */
+  (function () {
+    const iv = nearestRetrograde('venus', n0 + 120);
+    let mn = 1e9, mx = -1e9;
+    for (let n = iv.start - 20; n <= iv.end + 20; n += 0.5) { const d = geo('venus', n).dec; mn = Math.min(mn, d); mx = Math.max(mx, d); }
+    add('금성 역행 경로의 적위 변화폭', '0 도 아님 (고리 모양)', f(mx - mn, 3) + ' 도', (mx - mn) > 1,
+        '궤도경사를 0으로 두면 직선이 되어 버린다');
+  })();
+
+  /* 21. h + Z = 90 (무작위 20개) + 두 가지 독립 구현 일치 */
+  (function () {
+    const rnd = mulberry32(20260909);
+    let worst = 0, worstA = 0, worstH = 0;
+    for (let i = 0; i < 20; i++) {
+      const ra = rnd() * 360, dec = rnd() * 160 - 80, lat = rnd() * 160 - 80, H = rnd() * 360 - 180;
+      const p = altaz(H, dec, lat), q = altazFormula(H, dec, lat);
+      worst = Math.max(worst, Math.abs(p.h + p.Z - 90));
+      worstH = Math.max(worstH, Math.abs(p.h - q.h));
+      worstA = Math.max(worstA, Math.abs(norm180(p.A - q.A)));
+    }
+    add('h + Z = 90 (무작위 20개)', '오차 1e-9 이내', worst.toExponential(2) + ' 도', worst < 1e-9, '');
+    add('지평좌표 두 구현 일치 (고도)', '오차 1e-9 이내', worstH.toExponential(2) + ' 도', worstH < 1e-9, '벡터식 vs 학습지 공식');
+    add('지평좌표 두 구현 일치 (방위각)', '오차 1e-9 이내', worstA.toExponential(2) + ' 도', worstA < 1e-9, '');
+  })();
+
+  /* 22. 천구북극의 고도 = 위도 (무작위 20개) */
+  (function () {
+    const rnd = mulberry32(77777);
+    let worst = 0;
+    for (let i = 0; i < 20; i++) {
+      const lat = rnd() * 178 - 89;
+      const h = altaz(0, 90, lat).h;                 // 천구북극은 적위 +90
+      worst = Math.max(worst, Math.abs(h - lat));
+    }
+    add('천구북극의 고도 = 위도 (무작위 20개)', '오차 1e-9 이내', worst.toExponential(2) + ' 도', worst < 1e-9, '');
+  })();
+
+  /* 방위각 규약 (북점 기준 시계방향) */
+  (function () {
+    const a1 = altaz(0, 0, 36.5);          // 시간각 0, 적위 0 -> 남점
+    const a2 = altaz(-90, 0, 36.5);        // 시간각 -90, 적위 0 -> 정동
+    const a3 = altaz(90, 0, 36.5);         // 시간각 +90 -> 정서
+    add('방위각 규약 (남중)', 'A = 180 도, h = 53.5 도', 'A = ' + f(a1.A, 3) + ' 도, h = ' + f(a1.h, 3) + ' 도',
+        near(a1.A, 180, 1e-6) && near(a1.h, 53.5, 1e-6), '북점에서 시계방향');
+    add('방위각 규약 (동쪽 지평선)', 'A = 90 도, h = 0 도', 'A = ' + f(a2.A, 3) + ' 도, h = ' + f(a2.h, 3) + ' 도',
+        near(a2.A, 90, 1e-6) && near(a2.h, 0, 1e-6), '시간각 -90도');
+    add('방위각 규약 (서쪽 지평선)', 'A = 270 도, h = 0 도', 'A = ' + f(a3.A, 3) + ' 도, h = ' + f(a3.h, 3) + ' 도',
+        near(a3.A, 270, 1e-6) && near(a3.h, 0, 1e-6), '시간각 +90도');
+  })();
+
+  /* 일주운동 : 시간각은 시간이 지나면 커지고 (동 -> 서), 그 빠르기는 항성시 15.041 도/시 */
+  (function () {
+    const n = nFromYMD(2026, 5, 10) + 0.25, ra = 123.4;
+    const h1 = hourAngle(n, ra), h2 = hourAngle(n + 1 / 24, ra);
+    const rate = norm180(h2 - h1);
+    add('시간각 증가 (일주운동 동 -> 서)', '1시간에 15.041도 (오차 0.01)', rate.toFixed(4) + ' 도/시', near(rate, 15.041, 0.01),
+        '태양시 1시간 동안 항성시는 15.041도 간다');
+    const t1 = transitLT(n, ra), t2 = transitLT(n + 1, ra);
+    const shift = norm180((t2 - t1) * 15) / 15 * 60;
+    add('같은 별의 남중 시각 변화', '하루에 약 -3.94분 (오차 0.2)', shift.toFixed(3) + ' 분/일', near(shift, -3.94, 0.2),
+        '별은 날마다 약 4분씩 일찍 남중한다');
+    const aE = altaz(-90, 0, 36.5).A, aS = altaz(0, 0, 36.5).A, aW = altaz(90, 0, 36.5).A;
+    add('일주운동 차례', '동(90) -> 남(180) -> 서(270)', aE.toFixed(0) + ' -> ' + aS.toFixed(0) + ' -> ' + aW.toFixed(0),
+        aE < aS && aS < aW, '시간각이 커지는 차례대로');
+  })();
+
+  /* 적경 측정 방향 : 춘분점에서 반시계 (서 -> 동), 황경 증가 = 적경 증가 */
+  (function () {
+    let bad = 0;
+    for (let l = 0; l < 360; l += 5) {
+      const a1 = eclToEq(l, 0).ra, a2 = eclToEq(l + 1, 0).ra;
+      if (norm180(a2 - a1) <= 0) bad++;
+    }
+    add('적경 측정 방향', '황경 증가 -> 적경 증가 (반시계)', bad === 0 ? '72 / 72 구간 모두 증가' : bad + ' 구간 감소', bad === 0, '');
+    const s90 = eclToEq(90, 0), s180 = eclToEq(180, 0), s270 = eclToEq(270, 0);
+    add('황도 기준점 변환', '90도 -> 6h/+23.44, 180도 -> 12h/0, 270도 -> 18h/-23.44',
+        f(s90.raH, 3) + 'h/' + f(s90.dec, 2) + ', ' + f(s180.raH, 3) + 'h/' + f(s180.dec, 2) + ', ' + f(s270.raH, 3) + 'h/' + f(s270.dec, 2),
+        near(s90.raH, 6, 1e-6) && near(s90.dec, 23.44, 1e-6) && near(s180.raH, 12, 1e-6) &&
+        Math.abs(s180.dec) < 1e-9 && near(s270.raH, 18, 1e-6) && near(s270.dec, -23.44, 1e-6), '');
+  })();
+
+  /* 황도 경사각 */
+  (function () {
+    let mx = -90, mn = 90;
+    for (let l = 0; l < 360; l += 0.25) { const d = eclToEq(l, 0).dec; mx = Math.max(mx, d); mn = Math.min(mn, d); }
+    add('황도와 천구 적도가 이루는 각', '23.44 도 (오차 0.01)', f(mx, 4) + ' / ' + f(mn, 4) + ' 도',
+        near(mx, 23.44, 0.01) && near(mn, -23.44, 0.01), '황도 최대 적위 = 경사각');
+  })();
+
+  /* 동방최대이각 -> 초저녁 서쪽, 서방최대이각 -> 새벽 동쪽 */
+  (function () {
+    const relMax = acosd(BODIES.venus.a);
+    const nW = nOfRel('venus', relMax, n0 + 60), nE = nOfRel('venus', 360 - relMax, n0 + 60);
+    const cW = configAt('venus', nW, 3), cE = configAt('venus', nE, 3);
+    const vW = visibilityKo('venus', nW), vE = visibilityKo('venus', nE);
+    add('서방최대이각 관측', '새벽 동쪽 하늘', cW.label + ' -> ' + vW.when + ' ' + vW.where,
+        cW.name === '서방최대이각' && vW.when === '새벽' && vW.where === '동쪽 하늘', '태양보다 먼저 뜬다');
+    add('동방최대이각 관측', '초저녁 서쪽 하늘', cE.label + ' -> ' + vE.when + ' ' + vE.where,
+        cE.name === '동방최대이각' && vE.when === '초저녁' && vE.where === '서쪽 하늘', '태양보다 늦게 진다');
+    add('금성 최대 관측 가능 시간', '약 3시간 (오차 0.3)', durString(observingHours(geo('venus', nE).elong)),
+        near(observingHours(geo('venus', nE).elong), 3.09, 0.3), '이각 / 15도 per hour');
+    const nMe = nOfRel('mercury', 360 - acosd(BODIES.mercury.a), n0 + 30);
+    add('수성 최대 관측 가능 시간', '약 1.5시간 (오차 0.3)', durString(observingHours(geo('mercury', nMe).elong)),
+        near(observingHours(geo('mercury', nMe).elong), 1.52, 0.3), '학습지 18~28도 -> 1.2 ~ 1.9시간');
+  })();
+
+  /* 충 / 동구 / 서구 의 뜨고 지는 시각 */
+  (function () {
+    const lat = 36.5;
+    const nOp = nOfRel('mars', 0, n0 + 200);
+    const g = geo('mars', nOp);
+    const rts = riseTransitSet(nOp, g.ra, g.dec, lat);
+    const sn = sunPos(nOp), sr = riseTransitSet(nOp, sn.ra, sn.dec, lat);
+    add('충 : 남중 시각', '자정 (0시, 오차 12분)', hmString(rts.transit),
+        Math.min(Math.abs(rts.transit), Math.abs(rts.transit - 24)) * 60 <= 12, '');
+    add('충 : 해질 때 뜨고 해뜰 때 진다', '차이 30분 이내',
+        '일몰 ' + hmString(sr.set) + ' / 출 ' + hmString(rts.rise) + ' , 일출 ' + hmString(sr.rise) + ' / 몰 ' + hmString(rts.set),
+        Math.abs(norm180((rts.rise - sr.set) * 15)) / 15 * 60 <= 30 && Math.abs(norm180((rts.set - sr.rise) * 15)) / 15 * 60 <= 30, '');
+    add('충 : 관측 가능 시간', '약 12시간 (오차 0.5)', durString(observingHours(geo('mars', nOp).elong)),
+        near(observingHours(geo('mars', nOp).elong), 12, 0.5), '이각 180도 / 15');
+    const relQ = acosd(BODIES.earth.a / BODIES.mars.a);
+    const nEQ = nOfRel('mars', relQ, n0 + 200), nWQ = nOfRel('mars', 360 - relQ, n0 + 200);
+    const cEQ = configAt('mars', nEQ, 3), cWQ = configAt('mars', nWQ, 3);
+    const gEQ = geo('mars', nEQ), gWQ = geo('mars', nWQ);
+    add('동구 판정', '동방 이각 90도', cEQ.label + ' / ' + gEQ.dir + ' ' + f(gEQ.elong, 2) + ' 도',
+        cEQ.name === '동구' && gEQ.dir === '동방' && near(gEQ.elong, 90, 1.5), '');
+    add('서구 판정', '서방 이각 90도', cWQ.label + ' / ' + gWQ.dir + ' ' + f(gWQ.elong, 2) + ' 도',
+        cWQ.name === '서구' && gWQ.dir === '서방' && near(gWQ.elong, 90, 1.5), '');
+    add('동구 / 서구 관측 가능 시간', '약 6시간 (오차 0.4)',
+        durString(observingHours(gEQ.elong)) + ' / ' + durString(observingHours(gWQ.elong)),
+        near(observingHours(gEQ.elong), 6, 0.4) && near(observingHours(gWQ.elong), 6, 0.4), '이각 90도 / 15');
+    const rEQ = riseTransitSet(nEQ, gEQ.ra, gEQ.dec, lat), sEQ = sunPos(nEQ);
+    const srEQ = riseTransitSet(nEQ, sEQ.ra, sEQ.dec, lat);
+    const rWQ = riseTransitSet(nWQ, gWQ.ra, gWQ.dec, lat);
+    const nCon = nOfRel('mars', 180, n0 + 200), gCon = geo('mars', nCon);
+    const rCon = riseTransitSet(nCon, gCon.ra, gCon.dec, lat);
+    const nearH = (a, b) => Math.abs(norm180((a - b) * 15)) / 15 * 60;
+    add('동구 : 남중 시각', '18시 (오차 30분)', hmString(rEQ.transit), nearH(rEQ.transit, 18) <= 30,
+        '해질 무렵 남중하고 자정에 진다');
+    add('서구 : 남중 시각', '6시 (오차 30분)', hmString(rWQ.transit), nearH(rWQ.transit, 6) <= 30,
+        '자정에 떠서 해뜰 무렵 남중한다');
+    add('합 : 남중 시각', '12시 (오차 30분)', hmString(rCon.transit), nearH(rCon.transit, 12) <= 30,
+        '태양과 같이 뜨고 진다 -> 관측 불가');
+    add('동구 : 지는 시각', '자정 (오차 45분)', hmString(rEQ.set),
+        Math.min(nearH(rEQ.set, 0), nearH(rEQ.set, 24)) <= 45, '');
+    add('서구 : 뜨는 시각', '자정 (오차 45분)', hmString(rWQ.rise),
+        Math.min(nearH(rWQ.rise, 0), nearH(rWQ.rise, 24)) <= 45, '');
+    add('참고 : 실제 일몰 시각', '계절에 따라 변함', '이 날 일몰 ' + hmString(srEQ.set), true,
+        '"해질 때 남중"은 일몰을 18시로 본 근사이다');
+  })();
+
+  /* 내행성 / 외행성 의 이각 범위 */
+  (function () {
+    for (const k of ['mercury', 'venus', 'mars', 'jupiter', 'saturn']) {
+      const S = synodicDays(k); let mn = 180, mx = 0;
+      for (let n = n0; n < n0 + S; n += S / 1500) { const e = geo(k, n).elong; mn = Math.min(mn, e); mx = Math.max(mx, e); }
+      const inner = BODIES[k].kind === 'inner';
+      /* 외행성의 최대 이각은 180도를 넘지 못하고, 궤도경사 때문에 충에서도
+         (180 - beta_max) 정도까지만 벌어진다.  beta_max = i * a / (a - 1) */
+      const bmax = inner ? 0 : BODIES[k].i * BODIES[k].a / (BODIES[k].a - 1);
+      const ok = inner ? (mx < maxElongation(k) + 0.5 && mn < 3)
+                       : (mx <= 180 && mx >= 180 - bmax - 0.5 && mn < 3);
+      add(BODIES[k].ko + ' 이각 범위', inner ? '0 ~ 최대이각 ' + f(maxElongation(k), 2) + '도'
+                                            : f(180 - bmax, 1) + ' ~ 180도 사이에서 최대',
+          f(mn, 2) + ' ~ ' + f(mx, 2) + ' 도', ok,
+          inner ? '내행성은 태양에서 멀리 못 떨어진다' : '궤도경사만큼 180도에 못 미친다');
+    }
+  })();
+
+  /* 천구 그림의 좌우 방향 : 남쪽에서 본 카메라에서 동점은 오른쪽, 서점은 왼쪽에 와야 한다.
+     여기가 뒤집히면 일주운동이 서에서 동으로 도는 것처럼 보인다. */
+  if (typeof makeCam === 'function') {
+    const cam = makeCam({ yaw: 180, pitch: 20, dist: 3.4 }, 400, 400);
+    const e = cam.proj({ E: 1, N: 0, U: 0 }), wp = cam.proj({ E: -1, N: 0, U: 0 });
+    const z = cam.proj({ E: 0, N: 0, U: 1 });
+    add('천구 그림의 좌우 (거울상 아님)', '동점은 오른쪽, 서점은 왼쪽, 천정은 위',
+        '동점 x ' + e.x.toFixed(0) + ', 서점 x ' + wp.x.toFixed(0) + ', 천정 y ' + z.y.toFixed(0),
+        e.x > 200 && wp.x < 200 && z.y < 200, '남쪽 하늘을 보는 카메라 기준');
+    /* 되돌리기(unproj)가 투영과 맞는지. unproj 는 언제나 앞쪽 반구의 교점을 주므로
+       (구를 눌렀을 때 보이는 점을 집어야 하니까) 앞쪽 반구의 점으로만 확인한다. */
+    let worst = 0;
+    for (const v of [{ E: 0, N: 0, U: 1 }, { E: 0, N: -1, U: 0 }, { E: 0.8, N: -0.5, U: 0.3317 },
+                     { E: 0.6, N: -0.5, U: 0.6245 }]) {
+      const u0 = vnorm(v);                       // unproj 는 단위구 위의 점을 주므로 먼저 정규화
+      const q = cam.proj(u0), r = cam.unproj(q.x, q.y);
+      if (r) worst = Math.max(worst, Math.abs(r.E - u0.E) + Math.abs(r.N - u0.N) + Math.abs(r.U - u0.U));
+    }
+    add('구면 클릭 좌표 되돌리기', '오차 1e-9 이내', worst.toExponential(2), worst < 1e-9, '투영 <-> 역투영 (구 가장자리는 시선이 접선이라 제외)');
+  }
+
+  /* 위상 그리기 : 밝은 쪽 가장자리가 반드시 태양을 향해야 한다 (학습지의 핵심 그림) */
+  if (typeof drawPhaseDisc === 'function' && typeof document !== 'undefined') {
+    const cv = document.createElement('canvas'); cv.width = 200; cv.height = 200;
+    const ctx = cv.getContext('2d');
+    /* 태양 방향 a 축 위에서 중심으로부터 f (반지름 대비, 부호 있음) 만큼 떨어진 점의 밝기 */
+    const probe = (a, f) => {
+      const d = ctx.getImageData(Math.round(100 + Math.cos(a) * 60 * f), Math.round(100 + Math.sin(a) * 60 * f), 1, 1).data;
+      return d[0] > 150 && d[1] < 80;
+    };
+    /* 태양 방향 축 위에서 명암 경계는 xt = -R cos(위상각) 에 있다.
+       밝은 띠 (xt ~ +R) 와 어두운 띠 (-R ~ xt) 의 한가운데를 찍어 확인한다. */
+    let bad = 0, cases = 0;
+    for (const ph of [45, 60, 90, 120, 135]) {
+      for (const adeg of [0, 90, 200, 300]) {
+        cases++;
+        ctx.clearRect(0, 0, 200, 200);
+        const a = adeg * DEG, xt = -cosd(ph);
+        drawPhaseDisc(ctx, 100, 100, 60, ph, a, '#ff0000', false);
+        if (!probe(a, (xt + 1) / 2)) bad++;            // 태양 쪽 띠는 밝아야 한다
+        if (probe(a, (xt - 1) / 2)) bad++;             // 반대쪽 띠는 어두워야 한다
+      }
+    }
+    add('위상의 밝은 쪽 방향', cases + '가지 모두 태양 쪽이 밝음', bad + ' 건 불일치', bad === 0,
+        '위상각 45 ~ 135도, 태양 방향 4가지');
+    let worstK = 0;
+    for (const ph of [0, 60, 90, 120, 180]) {
+      ctx.clearRect(0, 0, 200, 200);
+      drawPhaseDisc(ctx, 100, 100, 60, ph, 0.7, '#ff0000', false);
+      const im = ctx.getImageData(0, 0, 200, 200).data;
+      let lit = 0, tot = 0;
+      for (let i = 0; i < im.length; i += 4) { if (im[i + 3] > 10) { tot++; if (im[i] > 150 && im[i + 1] < 80) lit++; } }
+      worstK = Math.max(worstK, Math.abs(lit / tot - (1 + cosd(ph)) / 2));
+    }
+    add('그려진 밝은 면적 = 조명 비율', 'k = (1 + cos i) / 2, 오차 0.03', '최대 오차 ' + worstK.toFixed(4), worstK < 0.03,
+        '실제로 칠해진 화소를 세서 비교');
+  }
+
+  /* 행성은 황도 부근에 머문다 */
+  (function () {
+    let mx = 0;
+    for (const k of ['mercury', 'venus', 'mars', 'jupiter', 'saturn']) {
+      const S = synodicDays(k);
+      for (let n = n0; n < n0 + S; n += S / 500) mx = Math.max(mx, Math.abs(geo(k, n).beta));
+    }
+    add('행성의 황위 범위', '8도 이내 (황도 부근)', '최대 ' + f(mx, 2) + ' 도', mx < 8,
+        '그래서 동 ~ 남 ~ 서쪽 하늘에서만 보인다');
+  })();
+
+  return rows;
+}
+
+/* =====================================================================
+   화면 공통 (상태, 캔버스, 3차원 투영)
+   ===================================================================== */
+const $ = id => document.getElementById(id);
+const el = (tag, cls, txt) => { const e = document.createElement(tag); if (cls) e.className = cls; if (txt !== undefined) e.textContent = txt; return e; };
+const BASE_DAY = nFromYMD(2026, 1, 1);
+const DAY_SPAN = 3652;          // 2026-01-01 ~ 2035-12-31
+
+const ST = {
+  t: nFromYMD(2026, 3, 21) + 21 / 24,
+  lat: 36.5,
+  star: { ra: 90, dec: 20 },
+  tab: 1, sub5: 'a',
+  planet3: 'mars', planet4: 'venus', kind4: 'inner',
+  win: 180,
+  play: false, speed: 1,
+  placing: false,
+  skyHour: 19,
+  stripMode: 'even',
+  view1: { yaw: 340, pitch: 22, dist: 3.4 },   // 북쪽 하늘 (천구북극이 잘 보이는 방향)
+  view2: { yaw: 340, pitch: 22, dist: 3.4 },
+  sweep: 1, sweeping: false,
+  show1: { horizon: 1, equator: 1, meridian: 1, zenith: 1, poles: 1, cardinal: 1, vertical: 1, hour: 1, diurnal: 1 },
+  show2: { horizon: 1, equator: 1, meridian: 0, ecliptic: 1, vernal: 1, seasons: 1, sun: 1, hour: 1, arcs: 1, star: 1 },
+  quiz: { cur: null, tries: 0, right: 0, per: {} },
+};
+
+/* 위치 관계로 건너뛸 때 날짜 범위를 벗어나면 회합주기만큼 되돌려 같은 위치 관계를 범위 안에서 찾는다 */
+function bringInRange(n, period) {
+  const lo = BASE_DAY, hi = BASE_DAY + DAY_SPAN;
+  if (period > 0) { while (n > hi) n -= period; while (n < lo) n += period; }
+  return Math.max(lo, Math.min(hi, n));
+}
+function gotoRel(key, rel, hour) {
+  const n = bringInRange(nOfRel(key, rel, ST.t), synodicDays(key));
+  setT(Math.floor(n) + (hour === undefined ? curHour() : hour) / 24);
+  return n;
+}
+function setT(t) {
+  ST.t = Math.max(BASE_DAY, Math.min(BASE_DAY + DAY_SPAN + 0.999, t));
+  syncBar(); render();
+}
+const curDayIdx = () => Math.floor(ST.t) - BASE_DAY;
+const curHour = () => (ST.t - Math.floor(ST.t)) * 24;
+function setDayIdx(i) { setT(BASE_DAY + i + curHour() / 24); }
+function setHour(h) { setT(Math.floor(ST.t) + norm24(h) / 24); }
+
+/* ---------- 캔버스 ---------- */
+function fit(cv) {
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const w = Math.max(200, cv.clientWidth || 300);
+  const h = Math.round(w * parseFloat(cv.dataset.ar || '0.8'));
+  cv.style.height = h + 'px';
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  const ctx = cv.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  return { ctx: ctx, w: w, h: h };
+}
+function txt(ctx, x, y, s, color, align, size, weight) {
+  ctx.save();
+  ctx.font = (weight || '') + ' ' + (size || 12) + 'px "Apple SD Gothic Neo","Malgun Gothic","Noto Sans KR",sans-serif';
+  ctx.textAlign = align || 'left'; ctx.textBaseline = 'middle';
+  ctx.lineWidth = 3; ctx.strokeStyle = 'rgba(5,8,15,.85)'; ctx.lineJoin = 'round';
+  ctx.strokeText(s, x, y); ctx.fillStyle = color; ctx.fillText(s, x, y);
+  ctx.restore();
+}
+
+/* ---------- 벡터 ---------- */
+const vlen = v => Math.hypot(v.E, v.N, v.U);
+const vnorm = v => { const m = vlen(v) || 1; return { E: v.E / m, N: v.N / m, U: v.U / m }; };
+const vdot = (a, b) => a.E * b.E + a.N * b.N + a.U * b.U;
+const vcross = (a, b) => ({ E: a.N * b.U - a.U * b.N, N: a.U * b.E - a.E * b.U, U: a.E * b.N - a.N * b.E });
+const vperp = (a, u) => vnorm({ E: a.E - vdot(a, u) * u.E, N: a.N - vdot(a, u) * u.N, U: a.U - vdot(a, u) * u.U });
+const V = (E, N, U) => ({ E: E, N: N, U: U });
+const vAltAz = (A, h) => V(cosd(h) * sind(A), cosd(h) * cosd(A), sind(h));
+
+/* 두 직교 단위벡터가 만드는 대원 */
+function greatCircle(u, v, n) {
+  n = n || 240; const out = [];
+  for (let i = 0; i <= n; i++) { const t = i * 360 / n; out.push(V(u.E * cosd(t) + v.E * sind(t), u.N * cosd(t) + v.N * sind(t), u.U * cosd(t) + v.U * sind(t))); }
+  return out;
+}
+/* 적위가 일정한 소원 = 일주권 */
+function diurnalCircle(dec, lat, n) {
+  n = n || 240; const out = [];
+  for (let i = 0; i <= n; i++) { const H = i * 360 / n; const v = horizonVec(H, dec, lat); out.push(V(v.E, v.N, v.U)); }
+  return out;
+}
+const poleVec = lat => V(0, cosd(lat), sind(lat));
+const ZEN = V(0, 0, 1);
+/* 적경 적위 -> 지평좌표계 단위벡터 (현재 시각) */
+function starVec(ra, dec, lat, n) { const v = horizonVec(hourAngle(n, ra), dec, lat); return V(v.E, v.N, v.U); }
+
+/* ---------- 3차원 투영 ---------- */
+function makeCam(view, w, h, scale, oyFrac) {
+  const cyw = cosd(view.yaw), syw = sind(view.yaw), cp = cosd(view.pitch), sp = sind(view.pitch);
+  const R = Math.min(w, h) * (scale || 0.40), D = view.dist, f = R * D;
+  const ox = w / 2, oy = h * (oyFrac || 0.5);
+  return {
+    w: w, h: h, D: D, f: f, ox: ox, oy: oy, R: R,
+    to3: function (p) {
+      const x1 = p.E * cyw + p.N * syw, y1 = -p.E * syw + p.N * cyw, z1 = p.U;
+      return { x: x1, y: y1 * cp + z1 * sp, z: -y1 * sp + z1 * cp };
+    },
+    /* (x2, y2, z2) 는 오른손 좌표계이고 카메라는 -y2 방향을 본다. 그대로 x2 를 화면 오른쪽으로
+       두면 좌우가 뒤집힌 거울상이 되므로 (동쪽과 서쪽이 바뀐다) x 를 뒤집어 준다. */
+    proj: function (p) { const q = this.to3(p), s = f / (D - q.y); return { x: ox - q.x * s, y: oy - q.z * s, depth: q.y, s: s }; },
+    unproj: function (sx, sy) {
+      const u = -(sx - ox) / f, wv = -(sy - oy) / f;
+      const dd = u * u + 1 + wv * wv, disc = D * D - dd * (D * D - 1);
+      if (disc < 0) return null;
+      const s = (D - Math.sqrt(disc)) / dd;
+      const X = s * u, Y = D - s, Z = s * wv;
+      const y1 = Y * cp - Z * sp, z1 = Y * sp + Z * cp, x1 = X;
+      return V(x1 * cyw - y1 * syw, x1 * syw + y1 * cyw, z1);
+    }
+  };
+}
+function strokeSph(ctx, cam, pts, o, layer) {
+  const P = pts.map(p => cam.proj(p));
+  ctx.save();
+  ctx.lineWidth = o.w || 1.4; ctx.strokeStyle = o.c; ctx.lineCap = 'round';
+  ctx.globalAlpha = (layer === 'back') ? (o.ba !== undefined ? o.ba : 0.28) : (o.a !== undefined ? o.a : 1);
+  ctx.setLineDash(layer === 'back' ? [3, 5] : (o.d || []));
+  ctx.beginPath();
+  let pen = false;
+  for (let i = 0; i < P.length - 1; i++) {
+    const front = (P[i].depth > 0 && P[i + 1].depth > 0);
+    if ((layer === 'front') === front) { if (!pen) { ctx.moveTo(P[i].x, P[i].y); pen = true; } ctx.lineTo(P[i + 1].x, P[i + 1].y); }
+    else pen = false;
+  }
+  ctx.stroke(); ctx.restore();
+}
+function sphDot(ctx, cam, v, o) {
+  const p = cam.proj(v), front = p.depth > 0;
+  ctx.save(); ctx.globalAlpha = front ? 1 : 0.34;
+  ctx.fillStyle = o.c; ctx.beginPath(); ctx.arc(p.x, p.y, o.r || 4, 0, 7); ctx.fill();
+  if (o.ring) { ctx.strokeStyle = o.c; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(p.x, p.y, (o.r || 4) + 4, 0, 7); ctx.stroke(); }
+  ctx.restore();
+  if (o.t) txt(ctx, p.x + (o.dx === undefined ? 8 : o.dx), p.y + (o.dy === undefined ? -9 : o.dy), o.t,
+               front ? (o.tc || o.c) : 'rgba(150,165,195,.6)', o.ta || 'left', o.ts || 12, o.tw);
+  return p;
+}
+/* 지평면(땅) 채우기 */
+function fillGround(ctx, cam) {
+  const pts = greatCircle(V(1, 0, 0), V(0, 1, 0), 120).map(p => cam.proj(p));
+  ctx.save(); ctx.beginPath();
+  pts.forEach((p, i) => i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y));
+  ctx.closePath();
+  const g = ctx.createLinearGradient(0, cam.oy - cam.R, 0, cam.oy + cam.R);
+  g.addColorStop(0, 'rgba(126,231,135,.09)'); g.addColorStop(1, 'rgba(126,231,135,.03)');
+  ctx.fillStyle = g; ctx.fill(); ctx.restore();
+}
+/* 구 윤곽 : 거리 D 에서 본 단위구의 실루엣 반지름 = f / sqrt(D^2 - 1) */
+function sphereOutline(ctx, cam) {
+  ctx.save(); ctx.strokeStyle = 'rgba(120,140,180,.22)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(cam.ox, cam.oy, cam.f / Math.sqrt(cam.D * cam.D - 1), 0, 7);
+  ctx.stroke(); ctx.restore();
+}
+/* 지평선 위 / 아래로 끊어 주기 */
+function splitByHorizon(pts) {
+  const up = [], down = []; let cur = null, curUp = null;
+  for (let i = 0; i < pts.length; i++) {
+    const u = pts[i].U >= 0;
+    if (cur === null || u !== curUp) {
+      cur = []; if (i > 0) cur.push(pts[i - 1]);
+      curUp = u; (u ? up : down).push(cur);
+    }
+    cur.push(pts[i]);
+  }
+  return { up: up, down: down };
+}
+/* 구 끌어 돌리기 */
+function attachDrag(cv, view, onPlace) {
+  let id = null, lx = 0, ly = 0, moved = 0;
+  cv.addEventListener('pointerdown', e => {
+    id = e.pointerId; lx = e.clientX; ly = e.clientY; moved = 0; cv.setPointerCapture(id);
+  });
+  cv.addEventListener('pointermove', e => {
+    if (id !== e.pointerId) return;
+    const dx = e.clientX - lx, dy = e.clientY - ly; lx = e.clientX; ly = e.clientY;
+    moved += Math.abs(dx) + Math.abs(dy);
+    if (ST.placing && onPlace) return;
+    view.yaw = norm360(view.yaw - dx * 0.45);
+    view.pitch = Math.max(-88, Math.min(88, view.pitch + dy * 0.4));
+    render();
+  });
+  cv.addEventListener('pointerup', e => {
+    if (id !== e.pointerId) return;
+    if (moved < 8 && ST.placing && onPlace) {
+      const r = cv.getBoundingClientRect();
+      onPlace(e.clientX - r.left, e.clientY - r.top);
+    }
+    cv.releasePointerCapture(id); id = null;
+  });
+  cv.addEventListener('pointercancel', () => { id = null; });
+}
+
+/* ---------- 상단 바 ---------- */
+function syncBar() {
+  $('sDay').value = curDayIdx();
+  $('sHour').value = Math.round(curHour() * 60);
+  $('sLat').value = ST.lat;
+  $('vDay').textContent = koDate(ST.t);
+  $('vHour').textContent = hmString(curHour()) + ' (지방 태양시)';
+  $('vLat').textContent = (ST.lat >= 0 ? '북위 ' : '남위 ') + Math.abs(ST.lat).toFixed(1) + '도 (latitude)';
+}
+function wireBar() {
+  $('sDay').max = DAY_SPAN;
+  $('sDay').oninput = e => setDayIdx(+e.target.value);
+  $('sHour').oninput = e => setHour(+e.target.value / 60);
+  $('sLat').oninput = e => { ST.lat = +e.target.value; syncBar(); render(); };
+  document.querySelectorAll('[data-dday]').forEach(b => b.onclick = () => setT(ST.t + (+b.dataset.dday)));
+  $('btnNow').onclick = () => setT(nFromYMD(2026, 3, 21) + 21 / 24);
+  $('selSpeed').onchange = e => ST.speed = +e.target.value;
+  $('btnPlay').onclick = () => { ST.play = !ST.play; $('btnPlay').textContent = ST.play ? '정지' : '재생'; $('btnPlay').classList.toggle('on', ST.play); };
+  $('btnNote').onclick = () => { const n = $('noteBox'); n.hidden = !n.hidden; };
+  document.querySelectorAll('[data-lat]').forEach(b => b.onclick = () => { ST.lat = +b.dataset.lat; syncBar(); render(); });
+  $('tabs').querySelectorAll('button').forEach(b => b.onclick = () => showTab(+b.dataset.tab));
+}
+function showTab(n) {
+  ST.tab = n;
+  for (let i = 1; i <= 5; i++) $('tab' + i).hidden = (i !== n);
+  $('tabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.tab === n));
+  render();
+}
+/* 토글 단추 만들기 */
+function buildToggles(host, store, items) {
+  host.innerHTML = '';
+  items.forEach(it => {
+    const b = el('button', store[it.k] ? 'on' : '', it.n);
+    b.onclick = () => { store[it.k] = store[it.k] ? 0 : 1; b.classList.toggle('on', !!store[it.k]); render(); };
+    host.appendChild(b);
+  });
+}
+/* 보는 방향 고르기 */
+const VIEW_PRESETS = [
+  { n: '북쪽 하늘', yaw: 340, pitch: 22 },
+  { n: '남쪽 하늘', yaw: 200, pitch: 18 },
+  { n: '위에서 보기 (방위각)', yaw: 0, pitch: 88 },
+];
+function buildViewButtons(host, view) {
+  host.innerHTML = '';
+  host.appendChild(el('span', 'small', '보는 방향:'));
+  VIEW_PRESETS.forEach(v => {
+    const b = el('button', 'sm', v.n);
+    b.onclick = () => { view.yaw = v.yaw; view.pitch = v.pitch; render(); };
+    host.appendChild(b);
+  });
+}
+
+/* 애니메이션 */
+let lastTs = 0;
+function loop(ts) {
+  const dt = lastTs ? Math.min(0.1, (ts - lastTs) / 1000) : 0; lastTs = ts;
+  if (ST.play) setT(ST.t + ST.speed * dt);
+  if (ST.sweeping) { ST.sweep += dt * 0.55; if (ST.sweep >= 1) { ST.sweep = 1; ST.sweeping = false; } render(); }
+  requestAnimationFrame(loop);
+}
+
+/* =====================================================================
+   TAB 1  천구와 지평좌표계
+   ===================================================================== */
+const T1_ITEMS = [
+  { k: 'horizon', n: '지평선' }, { k: 'equator', n: '천구의 적도' }, { k: 'meridian', n: '자오선' },
+  { k: 'zenith', n: '천정 · 천저' }, { k: 'poles', n: '천구의 북극 · 남극' }, { k: 'cardinal', n: '북점 · 남점 · 동점 · 서점' },
+  { k: 'vertical', n: '수직권' }, { k: 'hour', n: '시간권' }, { k: 'diurnal', n: '일주권' },
+];
+const T2_ITEMS = [
+  { k: 'horizon', n: '지평선' }, { k: 'equator', n: '천구의 적도' }, { k: 'meridian', n: '자오선' },
+  { k: 'ecliptic', n: '황도' }, { k: 'vernal', n: '춘분점' }, { k: 'seasons', n: '절기 4점' },
+  { k: 'sun', n: '태양' }, { k: 'star', n: '별' }, { k: 'hour', n: '시간권' }, { k: 'arcs', n: '적경 · 적위 호' },
+];
+
+function drawSkyCommon(ctx, cam, show, lat) {
+  const P = poleVec(lat);
+  const eqU = V(1, 0, 0), eqV = vnorm(vcross(P, eqU));
+  const specs = [];
+  if (show.equator) specs.push({ pts: greatCircle(eqU, eqV), c: '#ffd479', w: 1.7 });
+  if (show.meridian) specs.push({ pts: greatCircle(ZEN, V(0, 1, 0)), c: '#9aa8c8', w: 1.2, d: [6, 4] });
+  if (show.horizon) specs.push({ pts: greatCircle(V(1, 0, 0), V(0, 1, 0)), c: '#7ee787', w: 2 });
+  return { P: P, specs: specs };
+}
+function drawCardinals(ctx, cam, show, lat) {
+  if (show.cardinal !== undefined && !show.cardinal) return;
+  sphDot(ctx, cam, vAltAz(0, 0), { c: '#7ee787', r: 3.5, t: '북점 (N)', ta: 'center', dx: 0, dy: -12 });
+  sphDot(ctx, cam, vAltAz(180, 0), { c: '#7ee787', r: 3.5, t: '남점 (S)', ta: 'center', dx: 0, dy: -12 });
+  sphDot(ctx, cam, vAltAz(90, 0), { c: '#7ee787', r: 3.5, t: '동점 (E)', ta: 'center', dx: 0, dy: -12 });
+  sphDot(ctx, cam, vAltAz(270, 0), { c: '#7ee787', r: 3.5, t: '서점 (W)', ta: 'center', dx: 0, dy: -12 });
+}
+
+function renderTab1() {
+  const c = fit($('cvSky1')), ctx = c.ctx;
+  const cam = makeCam(ST.view1, c.w, c.h, 0.37, 0.54);
+  const lat = ST.lat, n = ST.t, show = ST.show1;
+  const st = ST.star;
+  const sv = starVec(st.ra, st.dec, lat, n);
+  const aa = altaz(hourAngle(n, st.ra), st.dec, lat);
+  const ri = riseInfo(lat, st.dec);
+  const base = drawSkyCommon(ctx, cam, show, lat);
+  const specs = base.specs, P = base.P;
+
+  /* 수직권 · 시간권 */
+  if (show.vertical && Math.abs(vdot(sv, ZEN)) < 0.9995)
+    specs.push({ pts: greatCircle(ZEN, vperp(sv, ZEN)), c: '#c792ea', w: 1.3 });
+  if (show.hour && Math.abs(vdot(sv, P)) < 0.9995)
+    specs.push({ pts: greatCircle(P, vperp(sv, P)), c: '#6cc5ff', w: 1.3 });
+
+  /* 방위각 · 고도 호 */
+  const azPts = []; for (let a = 0; a <= aa.A + 0.01; a += Math.max(0.5, aa.A / 120)) azPts.push(vAltAz(a, 0));
+  const alPts = []; const stepH = aa.h / 60 || 1; for (let t = 0; Math.abs(t) <= Math.abs(aa.h) + 1e-9; t += stepH) alPts.push(vAltAz(aa.A, t));
+  specs.push({ pts: azPts, c: '#c792ea', w: 3.2, a: .95 });
+  specs.push({ pts: alPts, c: '#6cc5ff', w: 3.2, a: .95 });
+
+  /* 일주권 : 지평선 위는 종류별 색, 아래는 회색 점선 */
+  const typeColor = { circumpolar: '#6cc5ff', rise: '#ffffff', never: '#8595b4' }[ri.type];
+  let dUp = [], dDown = [];
+  if (show.diurnal) {
+    const sp = splitByHorizon(diurnalCircle(st.dec, lat, 300));
+    dUp = sp.up; dDown = sp.down;
+  }
+
+  for (const s of specs) strokeSph(ctx, cam, s.pts, s, 'back');
+  dUp.forEach(seg => strokeSph(ctx, cam, seg, { c: typeColor, w: 2 }, 'back'));
+  dDown.forEach(seg => strokeSph(ctx, cam, seg, { c: '#8595b4', w: 1.6, d: [5, 5] }, 'back'));
+  fillGround(ctx, cam);
+  sphereOutline(ctx, cam);
+  for (const s of specs) strokeSph(ctx, cam, s.pts, s, 'front');
+  dDown.forEach(seg => strokeSph(ctx, cam, seg, { c: '#8595b4', w: 1.6, d: [5, 5], a: .75 }, 'front'));
+  dUp.forEach(seg => strokeSph(ctx, cam, seg, { c: typeColor, w: 2.2 }, 'front'));
+
+  drawCardinals(ctx, cam, show, lat);
+  if (show.zenith) {
+    sphDot(ctx, cam, ZEN, { c: '#e8edf7', r: 4, t: '천정 (zenith)', ta: 'center', dx: 0, dy: -13 });
+    sphDot(ctx, cam, V(0, 0, -1), { c: '#8595b4', r: 3.5, t: '천저 (nadir)', ta: 'center', dx: 0, dy: 13 });
+  }
+  if (show.poles) {
+    sphDot(ctx, cam, P, { c: '#6cc5ff', r: 4.5, ring: 1, t: '천구의 북극', dx: 8, dy: -10 });
+    sphDot(ctx, cam, V(-P.E, -P.N, -P.U), { c: '#6cc5ff', r: 3.5, t: '천구의 남극', dx: 8, dy: 10 });
+  }
+  sphDot(ctx, cam, sv, { c: typeColor, r: 6, ring: 1, t: '별', tc: '#fff', dx: 9, dy: -11, ts: 13 });
+  /* 화면 왼쪽 위 요약 */
+  const wide1 = c.w >= 430;
+  if (wide1) txt(ctx, 10, 16, '위도 ' + ST.lat.toFixed(1) + '도  ·  ' + koDate(n) + ' ' + hmString(curHour()), '#a9b8d4', 'left', 12);
+  if (ST.view1.pitch > 70) txt(ctx, 10, c.h - 10, '위에서 내려다본 모습. 방위각은 북점에서 시계방향으로 커집니다.', '#c792ea', 'left', wide1 ? 11 : 10);
+  txt(ctx, 10, wide1 ? 34 : 15, 'A = ' + aa.A.toFixed(1) + '도   h = ' + aa.h.toFixed(1) + '도   Z = ' + aa.Z.toFixed(1) + '도',
+      aa.h >= 0 ? '#7ee787' : '#ff9f7a', 'left', wide1 ? 13 : 12, '600');
+
+  /* 오른쪽 값 */
+  const bd = decBoundaries(lat), tilt = diurnalTiltDeg(lat);
+  $('k1pole').textContent = altaz(0, 90, lat).h.toFixed(1) + '도 = ' + ST.lat.toFixed(1) + '도';
+  $('k1tilt').textContent = tilt.toFixed(1) + '도  (= 90도 - |위도|)';
+  if (Math.abs(lat) <= 0.5) { $('k1cp').textContent = '없음 (적도)'; $('k1nv').textContent = '없음 (적도)'; }
+  else {
+    $('k1cp').textContent = (lat >= 0 ? '적위 ≥ ' + bd.circumpolar.toFixed(1) : '적위 ≤ ' + bd.circumpolar.toFixed(1)) + '도' +
+      (Math.abs(lat) >= 89.5 ? ' (지평선 위 전부)' : '');
+    $('k1nv').textContent = (lat >= 0 ? '적위 ≤ ' + bd.never.toFixed(1) : '적위 ≥ ' + bd.never.toFixed(1)) + '도';
+  }
+  $('k1H').textContent = (hourAngle(n, st.ra) / 15).toFixed(2) + ' h (' + hourAngle(n, st.ra).toFixed(1) + '도)';
+  $('k1A').textContent = aa.A.toFixed(2) + '도';
+  $('k1h').textContent = aa.h.toFixed(2) + '도';
+  $('k1Z').textContent = aa.Z.toFixed(2) + '도';
+  $('k1sum').textContent = (aa.h + aa.Z).toFixed(3) + '도  (항상 90도)';
+  $('k1type').textContent = STAR_TYPE_KO[ri.type] + (aa.h >= 0 ? ' · 지금 지평선 위' : ' · 지금 지평선 아래');
+  $('k1mer').textContent = altaz(0, st.dec, lat).h.toFixed(2) + '도';
+  $('k1up').textContent = ri.type === 'circumpolar' ? '24시간 (지지 않음)' : ri.type === 'never' ? '0시간 (뜨지 않음)' : durString(ri.hours);
+  let cs;
+  if (Math.abs(lat) >= 89.5) cs = '극지역: 일주권이 지평선과 나란합니다 (' + tilt.toFixed(0) + '도). 지평선 위의 별은 모두 주극성이라 뜨고 지지 않습니다.';
+  else if (Math.abs(lat) <= 0.5) cs = '적도: 일주권이 지평선과 수직입니다 (' + tilt.toFixed(0) + '도). 모든 별이 수직으로 뜨고 지며 주극성도 전몰성도 없습니다.';
+  else cs = '중위도: 주극성, 출몰성, 전몰성이 모두 존재합니다. 일주권은 지평선과 ' + tilt.toFixed(1) + '도로 기울어 있습니다.';
+  $('k1case').textContent = cs;
+  $('inRa').value = (st.ra / 15).toFixed(2);
+  $('inDec').value = st.dec.toFixed(1);
+}
+
+function wireTab1() {
+  buildToggles($('t1Toggles'), ST.show1, T1_ITEMS);
+  buildViewButtons($('t1Views'), ST.view1);
+  attachDrag($('cvSky1'), ST.view1, (x, y) => {
+    const c = $('cvSky1'), cam = makeCam(ST.view1, c.clientWidth, c.clientHeight);
+    const v = cam.unproj(x, y); if (!v) return;
+    const hd = vecToHourDec(v.E, v.N, v.U, ST.lat);
+    ST.star.dec = hd.dec; ST.star.ra = norm360(lstDeg(ST.t) - hd.H);
+    render();
+  });
+  $('inRa').oninput = e => { const v = parseFloat(e.target.value); if (isFinite(v)) { ST.star.ra = norm360(v * 15); startSweep(); render(); } };
+  $('inDec').oninput = e => { const v = parseFloat(e.target.value); if (isFinite(v)) { ST.star.dec = Math.max(-90, Math.min(90, v)); startSweep(); render(); } };
+  $('btnPlace').onclick = () => {
+    ST.placing = !ST.placing;
+    $('btnPlace').textContent = '별 놓기 모드: ' + (ST.placing ? '켜기' : '끄기');
+    $('btnPlace').classList.toggle('on', ST.placing);
+  };
+  $('btnDiurnal').onclick = () => {
+    ST.speed = 0.0417; $('selSpeed').value = '0.0417';
+    ST.play = true; $('btnPlay').textContent = '정지'; $('btnPlay').classList.add('on');
+  };
+}
+function startSweep() { ST.sweep = 0; ST.sweeping = true; }
+
+/* =====================================================================
+   TAB 2  적도좌표계와 황도
+   ===================================================================== */
+const SEASONS = [
+  { lam: 0, ko: '춘분점', d: '3/21경', note: '낮 = 밤, 적위 - 에서 + 로' },
+  { lam: 90, ko: '하지점', d: '6/21경', note: '낮이 가장 김' },
+  { lam: 180, ko: '추분점', d: '9/23경', note: '낮 = 밤, 적위 + 에서 - 로' },
+  { lam: 270, ko: '동지점', d: '12/22경', note: '밤이 가장 김' },
+];
+
+function renderTab2() {
+  const c = fit($('cvSky2')), ctx = c.ctx;
+  const cam = makeCam(ST.view2, c.w, c.h, 0.37, 0.54);
+  const lat = ST.lat, n = ST.t, show = ST.show2, st = ST.star;
+  const base = drawSkyCommon(ctx, cam, show, lat);
+  const specs = base.specs, P = base.P;
+  const sv = starVec(st.ra, st.dec, lat, n);
+  const sun = sunPos(n);
+
+  if (show.ecliptic) {
+    const ec = []; for (let l = 0; l <= 360; l += 1.5) { const e2 = eclToEq(l, 0); ec.push(starVec(e2.ra, e2.dec, lat, n)); }
+    specs.push({ pts: ec, c: '#ff9f7a', w: 2 });
+  }
+  if (show.hour && Math.abs(vdot(sv, P)) < 0.9995)
+    specs.push({ pts: greatCircle(P, vperp(sv, P)), c: '#6cc5ff', w: 1.2, d: [5, 4] });
+
+  /* 적경 호 (춘분점에서 반시계, 적경이 커지는 방향) 와 적위 호 */
+  let raArc = [], decArc = [];
+  if (show.arcs) {
+    const target = st.ra * ST.sweep;
+    for (let a = 0; a <= target + 1e-6; a += Math.max(0.6, st.ra / 150)) raArc.push(starVec(a, 0, lat, n));
+    if (raArc.length < 2) raArc = [starVec(0, 0, lat, n), starVec(0.01, 0, lat, n)];
+    const dTarget = st.dec * ST.sweep, dstep = (st.dec || 1) / 60;
+    for (let d = 0; Math.abs(d) <= Math.abs(dTarget) + 1e-9; d += dstep) decArc.push(starVec(st.ra, d, lat, n));
+    if (decArc.length < 2) decArc = [starVec(st.ra, 0, lat, n)];
+    specs.push({ pts: raArc, c: '#c792ea', w: 3.4 });
+    if (decArc.length > 1) specs.push({ pts: decArc, c: '#6cc5ff', w: 3.4 });
+  }
+
+  for (const s of specs) strokeSph(ctx, cam, s.pts, s, 'back');
+  fillGround(ctx, cam); sphereOutline(ctx, cam);
+  for (const s of specs) strokeSph(ctx, cam, s.pts, s, 'front');
+  drawCardinals(ctx, cam, { cardinal: 1 }, lat);
+  sphDot(ctx, cam, P, { c: '#6cc5ff', r: 4, t: '천구의 북극', dx: 8, dy: -10 });
+  if (show.vernal) sphDot(ctx, cam, starVec(0, 0, lat, n), { c: '#ffffff', r: 5, ring: 1, t: '춘분점 (α=0h, δ=0)', tc: '#fff', dx: 9, dy: -11 });
+  if (show.seasons) SEASONS.forEach(s => {
+    if (s.lam === 0) return;
+    const e2 = eclToEq(s.lam, 0);
+    sphDot(ctx, cam, starVec(e2.ra, e2.dec, lat, n), { c: '#ff9f7a', r: 4, t: s.ko + ' ' + s.d, dx: 8, dy: -10, ts: 11 });
+  });
+  if (show.sun) sphDot(ctx, cam, starVec(sun.ra, sun.dec, lat, n), { c: '#ffd479', r: 7, ring: 1, t: '태양', tc: '#ffd479', dx: 10, dy: -12, ts: 13 });
+  if (show.star) sphDot(ctx, cam, sv, { c: '#ffffff', r: 5.5, ring: 1, t: '별', tc: '#fff', dx: 9, dy: -11 });
+  /* 적경이 커지는 방향 화살표 */
+  if (show.arcs && raArc.length > 3) {
+    const q1 = cam.proj(raArc[raArc.length - 2]), q2 = cam.proj(raArc[raArc.length - 1]);
+    if (q2.depth > 0) {
+      const ang = Math.atan2(q2.y - q1.y, q2.x - q1.x);
+      ctx.save(); ctx.fillStyle = '#c792ea'; ctx.translate(q2.x, q2.y); ctx.rotate(ang);
+      ctx.beginPath(); ctx.moveTo(7, 0); ctx.lineTo(-5, 4.5); ctx.lineTo(-5, -4.5); ctx.closePath(); ctx.fill(); ctx.restore();
+    }
+  }
+  txt(ctx, 10, 14, c.w >= 430 ? '적경은 춘분점에서 반시계 방향 (서 → 동) 으로 잽니다. 15도 = 1h'
+                                : '적경: 춘분점에서 반시계 (서 → 동). 15도 = 1h', '#c792ea', 'left', c.w >= 430 ? 11.5 : 10.5);
+
+  /* 값 */
+  const aa = altaz(hourAngle(n, st.ra), st.dec, lat);
+  $('k2ra').textContent = (st.ra / 15).toFixed(3) + ' h (' + st.ra.toFixed(1) + '도)';
+  $('k2dec').textContent = st.dec.toFixed(2) + '도';
+  $('k2A').textContent = aa.A.toFixed(2) + '도';
+  $('k2h').textContent = aa.h.toFixed(2) + '도';
+  $('k2fix').innerHTML = '시각이 흘러도 <b>적경 적위는 그대로</b>이고 <b>방위각 고도만 변합니다</b>. ' +
+    '그래서 성표와 성도에는 적도좌표계를 씁니다. 다만 태양, 달, 행성은 지구의 공전 때문에 적경 적위도 변합니다. ' +
+    '지금 이 별은 ' + STAR_TYPE_KO[riseInfo(lat, st.dec).type] + ' 이고 ' +
+    (aa.h >= 0 ? '지평선 위 ' + aa.h.toFixed(1) + '도' : '지평선 아래 ' + (-aa.h).toFixed(1) + '도') + ' 에 있습니다.';
+
+  const dl = dayLength(n, lat);
+  const yr = ymdFromN(n).y, doy = dayOfYear(n);
+  $('sDate2').max = daysInYear(yr) - 1;
+  $('sDate2').value = doy - 1;
+  $('vDate2').textContent = koDate(n);
+  $('k2slam').textContent = dl.lam.toFixed(2) + '도';
+  $('k2sra').textContent = dl.raH.toFixed(3) + ' h (' + dl.ra.toFixed(2) + '도)';
+  $('k2sdec').textContent = dl.dec.toFixed(2) + '도';
+  $('k2day').textContent = dl.type === 'circumpolar' ? '24시간 (백야)' : dl.type === 'never' ? '0시간 (극야)' : durString(dl.day);
+  $('k2night').textContent = dl.type === 'circumpolar' ? '0시간' : dl.type === 'never' ? '24시간' : durString(dl.night);
+  const dra = norm180(sunPos(n + 1).ra - sunPos(n).ra);
+  const mins = dra / 15 * 60;
+  $('k2rate').textContent = '+' + dra.toFixed(3) + '도 = +' + Math.floor(mins) + '분 ' + Math.round((mins % 1) * 60) +
+    '초  (연평균 +0.986도 = +3분 56초)';
+  drawSunChart();
+}
+
+function drawSunChart() {
+  const c = fit($('cvSunChart')), ctx = c.ctx, w = c.w, h = c.h;
+  const L = 38, R = 40, T = 12, B = 24, PW = w - L - R, PH = h - T - B;
+  const yr = ymdFromN(ST.t).y, y0 = nFromYMD(yr, 1, 1), N = daysInYear(yr), lat = ST.lat;
+  ctx.strokeStyle = '#26324b'; ctx.lineWidth = 1;
+  ctx.strokeRect(L, T, PW, PH);
+  /* 월 눈금 */
+  for (let m = 1; m <= 12; m++) {
+    const x = L + (nFromYMD(yr, m, 1) - y0) / N * PW;
+    ctx.beginPath(); ctx.moveTo(x, T); ctx.lineTo(x, T + PH); ctx.strokeStyle = 'rgba(38,50,75,.7)'; ctx.stroke();
+    if (m % 2 === 1) txt(ctx, x + 2, T + PH + 11, m + '월', '#8595b4', 'left', 10);
+  }
+  const yDec = d => T + PH * (1 - (d + 25) / 50);
+  const yDay = v => T + PH * (1 - v / 24);
+  ctx.setLineDash([3, 4]); ctx.strokeStyle = 'rgba(169,184,212,.35)';
+  ctx.beginPath(); ctx.moveTo(L, yDec(0)); ctx.lineTo(L + PW, yDec(0)); ctx.stroke(); ctx.setLineDash([]);
+  txt(ctx, L - 4, yDec(0), '0도', '#8595b4', 'right', 10);
+  txt(ctx, L - 4, yDec(23.44), '+23.4', '#ffd479', 'right', 10);
+  txt(ctx, L - 4, yDec(-23.44), '-23.4', '#ffd479', 'right', 10);
+  txt(ctx, L + PW + 4, yDay(12), '12h', '#6cc5ff', 'left', 10);
+  txt(ctx, L + PW + 4, yDay(6), '6h', '#6cc5ff', 'left', 10);
+  txt(ctx, L + PW + 4, yDay(18), '18h', '#6cc5ff', 'left', 10);
+  const line = (fn, color, ymap) => {
+    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = 2; let pen = false;
+    for (let i = 0; i <= N; i += 1) {
+      const v = fn(y0 + i + 0.5); if (v === null || !isFinite(v)) { pen = false; continue; }
+      const x = L + i / N * PW, y = ymap(v);
+      if (!pen) { ctx.moveTo(x, y); pen = true; } else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  };
+  line(n => sunPos(n).dec, '#ffd479', yDec);
+  line(n => { const d = dayLength(n, lat); return d.type === 'circumpolar' ? 24 : d.type === 'never' ? 0 : d.day; }, '#6cc5ff', yDay);
+  const xToday = L + (Math.floor(ST.t) - y0) / N * PW;
+  ctx.beginPath(); ctx.strokeStyle = '#ff9f7a'; ctx.lineWidth = 1.6;
+  ctx.moveTo(xToday, T); ctx.lineTo(xToday, T + PH); ctx.stroke();
+  const dl = dayLength(ST.t, lat);
+  txt(ctx, Math.min(xToday + 4, L + PW - 4), T + 10, koDateShort(ST.t) + '  δ ' + dl.dec.toFixed(1) + '도', '#ff9f7a',
+      xToday > L + PW * 0.7 ? 'right' : 'left', 11);
+  txt(ctx, L + 4, T + PH - 8, '위도 ' + lat.toFixed(1) + '도 기준', '#8595b4', 'left', 10);
+}
+
+function wireTab2() {
+  buildToggles($('t2Toggles'), ST.show2, T2_ITEMS);
+  buildViewButtons($('t2Views'), ST.view2);
+  attachDrag($('cvSky2'), ST.view2, null);
+  $('sDate2').oninput = e => {
+    const yr = ymdFromN(ST.t).y;
+    setT(nFromYMD(yr, 1, 1) + (+e.target.value) + curHour() / 24);
+  };
+  $('btnSweep').onclick = () => { startSweep(); render(); };
+  $('btnSunFollow').onclick = () => { const s = sunPos(ST.t); ST.star.ra = s.ra; ST.star.dec = s.dec; startSweep(); render(); };
+  const host = $('t2Season'); host.innerHTML = '';
+  SEASONS.forEach(s => {
+    const b = el('button', 'sm', s.ko + ' ' + s.d);
+    b.onclick = () => {
+      const yr = ymdFromN(ST.t).y;
+      const nn = nOfSunLon(s.lam, nFromYMD(yr, 1, 1) + s.lam / 360 * 365 + 80);
+      setT(Math.floor(nn) + curHour() / 24);
+    };
+    host.appendChild(b);
+  });
+}
+
+/* =====================================================================
+   TAB 3  행성의 겉보기 운동 (순행 · 역행 · 유)
+   ===================================================================== */
+const PLANET_KEYS = ['mercury', 'venus', 'mars', 'jupiter', 'saturn'];
+
+function radiusMap(r, amax, useLog) {
+  if (!useLog) return r / amax;
+  return Math.log(1 + r / 0.35) / Math.log(1 + amax / 0.35);
+}
+function drawTopView() {
+  const c = fit($('cvTop')), ctx = c.ctx, w = c.w, h = c.h;
+  const key = ST.planet3, b = BODIES[key], n = ST.t;
+  const amax = Math.max(1, b.a) * 1.06;
+  const useLog = b.a > 2;
+  const cx = w / 2, cy = h / 2, Rpx = Math.min(w, h) * 0.40;
+  const map = (x, y) => {
+    const r = Math.hypot(x, y) || 1e-9, th = Math.atan2(y, x);
+    const m = radiusMap(r, amax, useLog) * Rpx;
+    return { x: cx + m * Math.cos(th), y: cy - m * Math.sin(th) };
+  };
+  /* 배경 별 원 */
+  const Rbg = Math.min(w, h) * 0.465;
+  ctx.save(); ctx.strokeStyle = '#22304a'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(cx, cy, Rbg, 0, 7); ctx.stroke();
+  for (let l = 0; l < 360; l += 30) {
+    const a = l * DEG;
+    ctx.beginPath(); ctx.moveTo(cx + Math.cos(a) * (Rbg - 6), cy - Math.sin(a) * (Rbg - 6));
+    ctx.lineTo(cx + Math.cos(a) * Rbg, cy - Math.sin(a) * Rbg); ctx.stroke();
+  }
+  ctx.restore();
+  txt(ctx, cx + Rbg + 2, cy, '춘분점 방향 (황경 0도)', '#8595b4', 'right', 10);
+
+  /* 궤도 */
+  const orbit = (k, color, wd) => {
+    ctx.beginPath(); ctx.strokeStyle = color; ctx.lineWidth = wd; ctx.setLineDash([]);
+    for (let u = 0; u <= 360; u += 2) {
+      const bb = BODIES[k], O = bb.node, i = bb.i;
+      const x = bb.a * (cosd(O) * cosd(u) - sind(O) * sind(u) * cosd(i));
+      const y = bb.a * (sind(O) * cosd(u) + cosd(O) * sind(u) * cosd(i));
+      const p = map(x, y); u ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+    }
+    ctx.stroke();
+  };
+  orbit('earth', '#3a5f86', 1.4);
+  orbit(key, '#5c5140', 1.4);
+
+  /* 지나온 자취 */
+  const win = ST.win;
+  ctx.save();
+  [['earth', '#5aa9e6'], [key, b.color]].forEach(([k, col]) => {
+    ctx.beginPath(); ctx.strokeStyle = col; ctx.globalAlpha = .35; ctx.lineWidth = 2;
+    for (let i = 0; i <= 60; i++) {
+      const nn = n - win / 2 + win * i / 60, p0 = heliocentric(k, nn), p = map(p0.x, p0.y);
+      i ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y);
+    }
+    ctx.stroke();
+  });
+  ctx.restore();
+
+  const pe = heliocentric('earth', n), pp = heliocentric(key, n);
+  const E = map(pe.x, pe.y), Pp = map(pp.x, pp.y);
+  const g = geo(key, n);
+
+  /* 시선 : 지구 -> 행성 -> 배경 별 */
+  const dirx = Math.cos(g.lam * DEG), diry = Math.sin(g.lam * DEG);
+  const bg = { x: E.x + dirx * 3 * Rbg, y: E.y - diry * 3 * Rbg };
+  ctx.save(); ctx.strokeStyle = '#ffffff'; ctx.globalAlpha = .5; ctx.lineWidth = 1.2; ctx.setLineDash([5, 4]);
+  ctx.beginPath(); ctx.moveTo(E.x, E.y); ctx.lineTo(bg.x, bg.y); ctx.stroke(); ctx.restore();
+  /* 배경 별 원과의 교점 */
+  const sx = cx + Math.cos(g.lam * DEG) * Rbg, sy = cy - Math.sin(g.lam * DEG) * Rbg;
+  const ix = E.x + dirx * 1e4, iy = E.y - diry * 1e4;
+  (function () {
+    const dx = ix - E.x, dy = iy - E.y, fx = E.x - cx, fy = E.y - cy;
+    const A = dx * dx + dy * dy, B = 2 * (fx * dx + fy * dy), C = fx * fx + fy * fy - Rbg * Rbg;
+    const D = B * B - 4 * A * C; if (D < 0) return;
+    const t = (-B + Math.sqrt(D)) / (2 * A);
+    const px = E.x + t * dx, py = E.y + t * dy;
+    ctx.save(); ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(px, py, 4.5, 0, 7); ctx.fill();
+    ctx.restore();
+    txt(ctx, px, py - 12, '겉보기 방향', '#ffffff', 'center', 11);
+  })();
+
+  /* 태양 지구 행성 */
+  ctx.save();
+  ctx.fillStyle = '#ffd479'; ctx.beginPath(); ctx.arc(cx, cy, 7, 0, 7); ctx.fill();
+  ctx.fillStyle = '#5aa9e6'; ctx.beginPath(); ctx.arc(E.x, E.y, 5.5, 0, 7); ctx.fill();
+  ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(Pp.x, Pp.y, 6, 0, 7); ctx.fill();
+  ctx.restore();
+  txt(ctx, cx, cy + 16, '태양', '#ffd479', 'center', 11);
+  txt(ctx, E.x + 8, E.y - 9, '지구', '#5aa9e6', 'left', 11);
+  txt(ctx, Pp.x + 8, Pp.y - 9, b.ko, b.color, 'left', 11);
+
+  $('t3TopNote').textContent = useLog
+    ? '반지름 축을 로그로 압축했습니다 (' + b.ko + ' 궤도가 커서 그대로 그리면 지구 궤도가 점이 됩니다). 각도는 압축하지 않았으므로 방향은 정확합니다.'
+    : '반지름 축은 실제 비율 그대로입니다 (1 AU = 지구 궤도 반지름).';
+}
+
+function drawPath() {
+  const c = fit($('cvPath')), ctx = c.ctx, w = c.w, h = c.h;
+  const key = ST.planet3, b = BODIES[key], n = ST.t, win = ST.win;
+  const n0 = n - win / 2, n1 = n + win / 2;
+  const M = 340, step = win / M;
+  const pts = []; let acc = 0, prev = null;
+  for (let i = 0; i <= M; i++) {
+    const nn = n0 + i * step, g = geo(key, nn);
+    if (prev !== null) acc += norm180(g.ra - prev);
+    prev = g.ra;
+    pts.push({ n: nn, ra: (i === 0 ? g.ra : pts[0].ra0 + acc), dec: g.dec, ra0: g.ra });
+    if (i === 0) { pts[0].ra0 = g.ra; pts[0].ra = g.ra; }
+  }
+  let xmin = 1e9, xmax = -1e9, ymin = 1e9, ymax = -1e9;
+  pts.forEach(p => { xmin = Math.min(xmin, p.ra); xmax = Math.max(xmax, p.ra); ymin = Math.min(ymin, p.dec); ymax = Math.max(ymax, p.dec); });
+  const padx = Math.max(1.2, (xmax - xmin) * 0.10), pady = Math.max(1.2, (ymax - ymin) * 0.22);
+  xmin -= padx; xmax += padx; ymin -= pady; ymax += pady;
+  const L = 42, R = 12, T = 14, B = 30, PW = w - L - R, PH = h - T - B;
+  /* 적경은 동쪽(증가)이 왼쪽으로 오도록 그린다 (성도 관례) */
+  const X = ra => L + PW * (xmax - ra) / (xmax - xmin);
+  const Y = de => T + PH * (ymax - de) / (ymax - ymin);
+  ctx.strokeStyle = '#26324b'; ctx.lineWidth = 1; ctx.strokeRect(L, T, PW, PH);
+  /* 눈금 */
+  const rstep = (xmax - xmin) > 60 ? 30 : (xmax - xmin) > 20 ? 10 : (xmax - xmin) > 8 ? 5 : 2;
+  for (let a = Math.ceil(xmin / rstep) * rstep; a <= xmax; a += rstep) {
+    const x = X(a);
+    ctx.beginPath(); ctx.strokeStyle = 'rgba(38,50,75,.8)'; ctx.moveTo(x, T); ctx.lineTo(x, T + PH); ctx.stroke();
+    txt(ctx, x, T + PH + 11, (norm360(a) / 15).toFixed(1) + 'h', '#8595b4', 'center', 10);
+  }
+  const dstep = (ymax - ymin) > 40 ? 10 : (ymax - ymin) > 12 ? 5 : 2;
+  for (let d = Math.ceil(ymin / dstep) * dstep; d <= ymax; d += dstep) {
+    const y = Y(d);
+    ctx.beginPath(); ctx.strokeStyle = 'rgba(38,50,75,.8)'; ctx.moveTo(L, y); ctx.lineTo(L + PW, y); ctx.stroke();
+    txt(ctx, L - 4, y, d + '도', '#8595b4', 'right', 10);
+  }
+  txt(ctx, L + PW / 2, T + PH + 24, '적경 (RA) → 왼쪽이 동쪽', '#a9b8d4', 'center', 11);
+  txt(ctx, 12, T + PH / 2, '적위', '#a9b8d4', 'center', 11);
+
+  /* 황도 기준선 : beta = 0 이면 tan(적위) = tan(경사각) sin(적경) */
+  ctx.save(); ctx.strokeStyle = '#5b6b8c'; ctx.lineWidth = 1.4; ctx.setLineDash([6, 4]); ctx.beginPath();
+  for (let i = 0; i <= 200; i++) {
+    const a = xmin + (xmax - xmin) * i / 200;
+    const d = Math.atan(tand(OBLIQUITY) * sind(a)) * RAD;
+    const x = X(a), y = Y(d); i ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+  }
+  ctx.stroke(); ctx.restore();
+
+  /* 경로 : 순행 / 역행 색 구분 */
+  ctx.lineWidth = 2.6; ctx.lineCap = 'round';
+  for (let i = 0; i < pts.length - 1; i++) {
+    const inc = pts[i + 1].ra - pts[i].ra;
+    ctx.strokeStyle = inc >= 0 ? '#7ee787' : '#ff8a7a';
+    ctx.beginPath(); ctx.moveTo(X(pts[i].ra), Y(pts[i].dec)); ctx.lineTo(X(pts[i + 1].ra), Y(pts[i + 1].dec)); ctx.stroke();
+  }
+  /* 유 */
+  const ivs = retrogradeIntervals(key, n0, n1, Math.max(0.5, win / 300));
+  const at = nn => { let best = pts[0], bd = 1e9; for (const p of pts) { const d = Math.abs(p.n - nn); if (d < bd) { bd = d; best = p; } } return best; };
+  ivs.forEach(iv => {
+    [iv.start, iv.end].forEach(nn => {
+      if (nn <= n0 + 1e-6 || nn >= n1 - 1e-6) return;
+      const p = at(nn), x = X(p.ra), y = Y(p.dec);
+      ctx.save(); ctx.fillStyle = '#ffd479'; ctx.beginPath(); ctx.arc(x, y, 4, 0, 7); ctx.fill(); ctx.restore();
+      txt(ctx, x, y - 12, '유 ' + koDateShort(nn), '#ffd479', 'center', 10.5);
+    });
+  });
+  /* 현재 위치 */
+  const g = geo(key, n), cur = at(n);
+  ctx.save(); ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(X(cur.ra), Y(cur.dec), 6, 0, 7); ctx.fill();
+  ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(X(cur.ra), Y(cur.dec), 10, 0, 7); ctx.stroke(); ctx.restore();
+  txt(ctx, X(cur.ra) + 12, Y(cur.dec) - 10, b.ko + ' ' + koDateShort(n), '#fff', 'left', 11.5);
+  txt(ctx, L + 5, T + 10, koDateShort(n0) + ' ~ ' + koDateShort(n1) + ' (' + win + '일)', '#8595b4', 'left', 10.5);
+}
+
+function renderTab3() {
+  drawTopView(); drawPath();
+  const key = ST.planet3, b = BODIES[key], n = ST.t;
+  const g = geo(key, n), cfg = configAt(key, n, 2.5), r = raRate(key, n);
+  $('k3cfg').textContent = cfg.label + (cfg.exact ? '' : ' (' + cfg.delta.toFixed(1) + '도 차)');
+  $('k3el').textContent = elongText(g);
+  const mot = motionKo(key, n);
+  $('k3mot').innerHTML = '<span class="tag ' + (mot === '역행' ? 'r' : mot === '순행' ? 'g' : 'y') + '">' + mot + '</span> ' +
+    (mot === '역행' ? '적경 감소, 동 → 서' : mot === '순행' ? '적경 증가, 서 → 동' : '방향이 바뀌는 순간');
+  $('k3rate').textContent = (r * 3600).toFixed(1) + ' 초/일 (' + r.toFixed(4) + ' 도/일)';
+  $('k3d').textContent = g.d.toFixed(4) + ' AU';
+  $('k3ad').textContent = g.angDiam.toFixed(2) + ' 초';
+  $('k3k').textContent = (g.k * 100).toFixed(1) + ' %';
+  $('k3syn').textContent = synodicDays(key).toFixed(1) + ' 일 (' + (synodicDays(key) / 365.2422).toFixed(2) + ' 년)';
+  $('k3ra').textContent = g.raH.toFixed(3) + ' h';
+  $('k3dec').textContent = g.dec.toFixed(2) + '도';
+  const iv = nearestRetrograde(key, n);
+  let msg = '';
+  if (iv) {
+    const mid = (iv.start + iv.end) / 2, mc = configAt(key, mid, 3);
+    msg = '가장 가까운 역행 구간: ' + koDate(iv.start) + ' ~ ' + koDate(iv.end) +
+      ' (' + (iv.end - iv.start).toFixed(1) + '일). 그 한가운데의 위치 관계는 <b>' + mc.label + '</b> 입니다.';
+    if (mot === '역행') msg += ' 지금은 역행 중입니다.';
+  }
+  $('k3msg').innerHTML = msg;
+  $('t3Planets').querySelectorAll('button').forEach(x => x.classList.toggle('on', x.dataset.pk === key));
+}
+
+function wireTab3() {
+  const host = $('t3Planets'); host.innerHTML = '';
+  PLANET_KEYS.forEach(k => {
+    const b = el('button', 'sm', BODIES[k].ko);
+    b.dataset.pk = k; b.onclick = () => { ST.planet3 = k; render(); };
+    host.appendChild(b);
+  });
+  $('selWin').onchange = e => { ST.win = +e.target.value; render(); };
+  $('btnRetro').onclick = () => {
+    const iv = nearestRetrograde(ST.planet3, ST.t);
+    if (iv) setT(Math.floor((iv.start + iv.end) / 2) + curHour() / 24);
+  };
+  $('btnSyn+').onclick = () => setT(bringInRange(ST.t + synodicDays(ST.planet3), synodicDays(ST.planet3)));
+  $('btnSyn-').onclick = () => setT(bringInRange(ST.t - synodicDays(ST.planet3), synodicDays(ST.planet3)));
+}
+
+/* =====================================================================
+   TAB 4  위치 관계와 위상
+   ===================================================================== */
+const INNER_KEYS = ['mercury', 'venus'], OUTER_KEYS = ['mars', 'jupiter', 'saturn'];
+const maxAngDiam = k => 2 * Math.atan(BODIES[k].R / (Math.abs(BODIES[k].a - 1) * AU_KM)) * 206264.806;
+const minAngDiam = k => 2 * Math.atan(BODIES[k].R / ((BODIES[k].a + 1) * AU_KM)) * 206264.806;
+
+/* 궤도 그림에서 쓰는 각 : 지구를 오른쪽에 고정한 상대 위치각 */
+function orbitPhi(key, n) { return norm360(meanLongitude(key, n) - meanLongitude('earth', n)); }
+function cfgMarks(key) {
+  return configAngles(key).map(c => ({ name: c.name, phi: BODIES[key].kind === 'inner' ? c.rel : norm360(-c.rel), rel: c.rel }));
+}
+
+/* ---------- 위상 그리기 ----------
+   태양 방향을 +x 로 두면 밝은 부분은  x > -cos(위상각) * sqrt(R^2 - y^2)
+   위상각 0도 -> 원반 전체가 밝음 (보름), 90도 -> 반, 180도 -> 전부 어두움 */
+function drawPhaseDisc(ctx, cx, cy, R, phaseDeg, sunAngle, color, showSun) {
+  const ci = cosd(phaseDeg);
+  ctx.save(); ctx.translate(cx, cy); ctx.rotate(sunAngle);
+  ctx.beginPath(); ctx.arc(0, 0, R, 0, 7);
+  ctx.fillStyle = '#141b2b'; ctx.fill();
+  ctx.strokeStyle = 'rgba(150,168,200,.45)'; ctx.lineWidth = 1; ctx.stroke();
+  if (phaseDeg < 179.6) {
+    ctx.beginPath();
+    for (let a = -90; a <= 90; a += 3) ctx.lineTo(R * cosd(a), R * sind(a));
+    for (let u = 90; u >= -90; u -= 3) ctx.lineTo(-R * ci * cosd(u), R * sind(u));
+    ctx.closePath();
+    ctx.fillStyle = color; ctx.fill();
+  }
+  ctx.restore();
+  if (showSun) {
+    const sx = cx + Math.cos(sunAngle) * (R + 24), sy = cy + Math.sin(sunAngle) * (R + 24);
+    ctx.save(); ctx.strokeStyle = '#ffd479'; ctx.lineWidth = 1.4; ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(cx + Math.cos(sunAngle) * (R + 6), cy + Math.sin(sunAngle) * (R + 6));
+    ctx.lineTo(sx, sy); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle = '#ffd479'; ctx.beginPath(); ctx.arc(sx, sy, 5, 0, 7); ctx.fill(); ctx.restore();
+  }
+}
+/* 밝은 쪽 가장자리가 향하는 화면 각 (하늘에서 천정을 위로 두었을 때) */
+function brightLimbAngle(key, n, lat) {
+  const g = geo(key, n), s = sunPos(n);
+  const pv = vnorm(starVec(g.ra, g.dec, lat, n)), sv = vnorm(starVec(s.ra, s.dec, lat, n));
+  if (Math.abs(vdot(pv, ZEN)) > 0.9999) return 0;
+  const up = vperp(ZEN, pv), right = vnorm(vcross(pv, up));
+  const d = vperp(sv, pv);
+  return Math.atan2(-vdot(d, up), vdot(d, right));
+}
+
+/* ---------- 궤도 그림 ---------- */
+function drawOrbit() {
+  const c = fit($('cvOrbit')), ctx = c.ctx, w = c.w, h = c.h;
+  const key = ST.planet4, b = BODIES[key], n = ST.t, inner = b.kind === 'inner';
+  const amax = Math.max(1, b.a) * 1.12, useLog = b.a > 2;
+  const cx = w / 2, cy = h / 2, Rpx = Math.min(w, h) * 0.34;
+  const rr = a => radiusMap(a, amax, useLog) * Rpx;
+  const pt = (a, phi) => ({ x: cx + rr(a) * cosd(phi), y: cy - rr(a) * sind(phi) });
+  const ring = (a, col, wd, dash) => {
+    ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, rr(a), 0, 7);
+    ctx.strokeStyle = col; ctx.lineWidth = wd; ctx.setLineDash(dash || []); ctx.stroke(); ctx.restore();
+  };
+  ring(1, '#3a5f86', 1.6); ring(b.a, '#5c5140', 1.6);
+  const E = pt(1, 0), phi = orbitPhi(key, n), P = pt(b.a, phi);
+  const g = geo(key, n);
+
+  /* 위치 관계 표시점 */
+  cfgMarks(key).forEach(m => {
+    const q = pt(b.a, m.phi);
+    ctx.save(); ctx.fillStyle = '#4d5b78'; ctx.beginPath(); ctx.arc(q.x, q.y, 3.5, 0, 7); ctx.fill(); ctx.restore();
+    /* 가로축 근처의 이름표는 지구 태양 표시와 겹치므로 위아래로 비켜 쓴다 */
+    const out = 15, nudge = Math.abs(sind(m.phi)) < 0.30 ? (sind(m.phi) >= 0 ? -14 : 14) : 0;
+    const lx = cx + (rr(b.a) + out) * cosd(m.phi), ly = cy - (rr(b.a) + out) * sind(m.phi) + nudge;
+    txt(ctx, lx, ly, m.name, '#8595b4', cosd(m.phi) < -0.25 ? 'right' : cosd(m.phi) > 0.25 ? 'left' : 'center', 10.5);
+  });
+
+  /* 내행성 최대이각 접선 */
+  if (inner) {
+    const rm = acosd(b.a);
+    [rm, -rm].forEach(s => {
+      const q = pt(b.a, s);
+      const dx = q.x - E.x, dy = q.y - E.y, L = Math.hypot(dx, dy);
+      ctx.save(); ctx.strokeStyle = '#c792ea'; ctx.lineWidth = 1.2; ctx.setLineDash([5, 4]);
+      ctx.beginPath(); ctx.moveTo(E.x, E.y); ctx.lineTo(E.x + dx / L * (L + 34), E.y + dy / L * (L + 34)); ctx.stroke(); ctx.restore();
+    });
+    /* 접선 두 개가 최대이각을 만든다. 각도 값은 캔버스 위쪽에 따로 써서 현재 이각 표시와 겹치지 않게 한다 */
+    txt(ctx, 8, 32, '접선 = 최대이각 ' + maxElongation(key).toFixed(2) + '도', '#c792ea', 'left', 11.5, '600');
+  }
+
+  /* 태양 지구 행성 그리고 시선 */
+  ctx.save();
+  ctx.strokeStyle = 'rgba(232,237,247,.32)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(E.x, E.y); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(P.x, P.y); ctx.stroke();
+  ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(E.x, E.y); ctx.lineTo(P.x, P.y); ctx.stroke();
+  ctx.restore();
+  /* 현재 이각 호 */
+  (function () {
+    const aSun = Math.atan2(cy - E.y, cx - E.x), aP = Math.atan2(P.y - E.y, P.x - E.x);
+    let d = aP - aSun; while (d > Math.PI) d -= 2 * Math.PI; while (d < -Math.PI) d += 2 * Math.PI;
+    ctx.save(); ctx.strokeStyle = '#7ee787'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(E.x, E.y, 22, aSun, aSun + d, d < 0); ctx.stroke(); ctx.restore();
+    const am = aSun + d / 2;
+    txt(ctx, E.x + Math.cos(am) * 40, E.y + Math.sin(am) * 40, '이각 ' + g.elong.toFixed(1) + '도', '#7ee787', 'center', 11.5, '600');
+  })();
+
+  ctx.save();
+  ctx.fillStyle = '#ffd479'; ctx.beginPath(); ctx.arc(cx, cy, 8, 0, 7); ctx.fill();
+  ctx.fillStyle = '#5aa9e6'; ctx.beginPath(); ctx.arc(E.x, E.y, 6.5, 0, 7); ctx.fill();
+  ctx.fillStyle = b.color; ctx.beginPath(); ctx.arc(P.x, P.y, 7.5, 0, 7); ctx.fill();
+  ctx.strokeStyle = '#fff'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(P.x, P.y, 11, 0, 7); ctx.stroke();
+  ctx.restore();
+  txt(ctx, cx, cy + 18, '태양', '#ffd479', 'center', 11);
+  txt(ctx, E.x, E.y - 16, '지구', '#5aa9e6', 'center', 11.5, '600');
+  txt(ctx, P.x + 13, P.y - 12, b.ko, b.color, 'left', 12, '600');
+  txt(ctx, 8, 14, useLog ? '반지름 축 로그 압축 (각도는 정확)' : '반지름 축 실제 비율', '#8595b4', 'left', 10.5);
+  txt(ctx, w - 8, 14, '지구를 오른쪽에 고정한 상대 위치', '#8595b4', 'right', 10.5);
+}
+
+/* ---------- 하늘 (지평선 띠) ---------- */
+function drawHorizonStrip() {
+  const c = fit($('cvHorizon')), ctx = c.ctx, w = c.w, h = c.h;
+  const key = ST.planet4, b = BODIES[key], lat = ST.lat, day0 = Math.floor(ST.t), n = ST.t;
+  const L = 30, R = 10, T = 8, B = 20, PW = w - L - R, PH = h - T - B;
+  const X = A => L + PW * norm360(A) / 360;
+  const Y = hh => T + PH * (90 - hh) / 110;
+  const sun = sunPos(n), sAA = altaz(hourAngle(n, sun.ra), sun.dec, lat);
+  /* 하늘 색 */
+  let sky = '#070b14';
+  if (sAA.h > 0) sky = '#1c3355'; else if (sAA.h > -6) sky = '#152238'; else if (sAA.h > -18) sky = '#0c1322';
+  ctx.fillStyle = sky; ctx.fillRect(L, T, PW, Y(0) - T);
+  ctx.fillStyle = '#0b1018'; ctx.fillRect(L, Y(0), PW, T + PH - Y(0));
+  ctx.strokeStyle = '#26324b'; ctx.lineWidth = 1; ctx.strokeRect(L, T, PW, PH);
+  ctx.beginPath(); ctx.strokeStyle = '#7ee787'; ctx.lineWidth = 2; ctx.moveTo(L, Y(0)); ctx.lineTo(L + PW, Y(0)); ctx.stroke();
+  [[0, '북 (N)'], [90, '동 (E)'], [180, '남 (S)'], [270, '서 (W)'], [360, '북 (N)']].forEach(([a, s]) => {
+    const x = X(a === 360 ? 359.99 : a);
+    ctx.beginPath(); ctx.strokeStyle = 'rgba(38,50,75,.9)'; ctx.moveTo(x, T); ctx.lineTo(x, T + PH); ctx.stroke();
+    txt(ctx, x, T + PH + 10, s, '#8595b4', 'center', 10.5);
+  });
+  [30, 60].forEach(hh => { ctx.beginPath(); ctx.strokeStyle = 'rgba(38,50,75,.7)'; ctx.moveTo(L, Y(hh)); ctx.lineTo(L + PW, Y(hh)); ctx.stroke(); txt(ctx, L - 3, Y(hh), hh + '도', '#8595b4', 'right', 10); });
+  txt(ctx, L - 3, Y(0), '0도', '#7ee787', 'right', 10);
+
+  /* 하루 동안의 경로 */
+  const trail = (ra, dec, col) => {
+    ctx.save(); ctx.strokeStyle = col; ctx.globalAlpha = .45; ctx.lineWidth = 1.4; ctx.setLineDash([4, 3]);
+    let prev = null; ctx.beginPath();
+    for (let hh = 0; hh <= 24; hh += 0.2) {
+      const nn = day0 + hh / 24, a = altaz(hourAngle(nn, ra), dec, lat);
+      if (a.h < -20) { prev = null; continue; }
+      const x = X(a.A), y = Y(a.h);
+      if (prev && Math.abs(a.A - prev) > 180) { prev = null; }
+      if (prev === null) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      prev = a.A;
+    }
+    ctx.stroke(); ctx.restore();
+  };
+  const gp = geo(key, n);
+  trail(sun.ra, sun.dec, '#ffd479');
+  trail(gp.ra, gp.dec, '#ff9f7a');
+  const pAA = altaz(hourAngle(n, gp.ra), gp.dec, lat);
+  const dot = (a, col, label, r) => {
+    if (a.h < -20) return;
+    const x = X(a.A), y = Y(a.h);
+    ctx.save(); ctx.fillStyle = col; ctx.globalAlpha = a.h < 0 ? .45 : 1;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.restore();
+    txt(ctx, x, y - r - 9, label, col, 'center', 11);
+  };
+  dot(sAA, '#ffd479', '태양 ' + sAA.h.toFixed(0) + '도', 7);
+  dot(pAA, '#ff9f7a', b.ko + ' ' + pAA.h.toFixed(0) + '도', 6);
+  txt(ctx, L + 4, T + 10, hmString(curHour()) + ' · ' + koDate(n), '#a9b8d4', 'left', 10.5);
+
+  /* 값 */
+  const sr = riseTransitSet(n, sun.ra, sun.dec, lat), pr = riseTransitSet(n, gp.ra, gp.dec, lat);
+  const ow = observableWindow(key, n, lat);
+  const vis = visibilityKo(key, n);
+  let s = (sAA.h < 0 ? '지금 태양은 지평선 아래 ' + (-sAA.h).toFixed(0) + '도   /   ' : '') +
+    '일출 ' + (sr.rise === null ? '-' : hmString(sr.rise)) + ' · 일몰 ' + (sr.set === null ? '-' : hmString(sr.set)) + '   /   ' +
+    b.ko + ' 출 ' + (pr.rise === null ? '-' : hmString(pr.rise)) + ' · 남중 ' + hmString(pr.transit) + ' · 몰 ' + (pr.set === null ? '-' : hmString(pr.set));
+  s += '   /   실제 관측 가능 시간대 ' + (ow.segments.length ? ow.segments.map(x => hmString(x.from) + '~' + hmString(x.to)).join(', ') : '없음');
+  s += '  (' + durString(ow.hours) + ')';
+  $('k4sky').textContent = s;
+  $('k4real').textContent = durString(ow.hours) + (ow.hours < 0.05 ? ' (관측 불가)' : '');
+  $('vSkyH').textContent = hmString(curHour()) + ' (지방 태양시)';
+  $('sSkyH').value = Math.round(curHour() * 60);
+  return vis;
+}
+
+/* ---------- 위상 화면 ---------- */
+function drawPhaseMain() {
+  const c = fit($('cvPhase')), ctx = c.ctx, w = c.w, h = c.h;
+  const key = ST.planet4, b = BODIES[key], n = ST.t, lat = ST.lat;
+  const g = geo(key, n);
+  const mx = maxAngDiam(key), mn = minAngDiam(key);
+  const Rmax = Math.min(w, h) * 0.34;
+  const R = Math.max(3, Rmax * g.angDiam / mx);
+  const cx = w * 0.42, cy = h / 2;
+  ctx.save();
+  ctx.strokeStyle = 'rgba(120,140,180,.30)'; ctx.setLineDash([3, 4]); ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.arc(cx, cy, Rmax, 0, 7); ctx.stroke();
+  ctx.beginPath(); ctx.arc(cx, cy, Rmax * mn / mx, 0, 7); ctx.stroke();
+  ctx.restore();
+  txt(ctx, cx, cy - Rmax - 10, '가장 클 때 ' + mx.toFixed(1) + '초', 'rgba(150,168,200,.75)', 'center', 10.5);
+  txt(ctx, cx, cy + Rmax + 12, '가장 작을 때 ' + mn.toFixed(1) + '초 (안쪽 점선)', 'rgba(150,168,200,.75)', 'center', 10.5);
+  const ang = brightLimbAngle(key, n, lat);
+  drawPhaseDisc(ctx, cx, cy, R, g.phase, ang, b.color, true);
+  txt(ctx, cx + Math.cos(ang) * (Rmax + 40), cy + Math.sin(ang) * (Rmax + 40), '태양 방향', '#ffd479', 'center', 10.5);
+  const pAA = altaz(hourAngle(n, g.ra), g.dec, lat);
+  txt(ctx, w - 8, 14, '천정을 위로 둔 방향', '#8595b4', 'right', 10.5);
+  txt(ctx, w - 8, 30, pAA.h >= 0 ? '지금 지평선 위 ' + pAA.h.toFixed(0) + '도' : '지금 지평선 아래', pAA.h >= 0 ? '#7ee787' : '#8595b4', 'right', 10.5);
+  txt(ctx, w - 8, h - 14, '조명 비율 ' + (g.k * 100).toFixed(1) + ' %', '#e8edf7', 'right', 12, '600');
+}
+
+/* ---------- 위상 순서 띠 ---------- */
+function buildStrip() {
+  const host = $('t4Strip'); host.innerHTML = '';
+  const key = ST.planet4, b = BODIES[key], inner = b.kind === 'inner';
+  let items = [];
+  if (ST.stripMode === 'even') {
+    const N = inner ? 6 : 5;
+    for (let i = 0; i < N; i++) items.push({ rel: i * 360 / N });
+  } else {
+    items = configAngles(key).map(c => ({ rel: c.rel }));
+  }
+  const mx = maxAngDiam(key);
+  items.forEach((it, idx) => {
+    const nn = nOfRel(key, it.rel, ST.t);
+    const g = geo(key, nn), cfg = configAt(key, nn, 3);
+    const d = el('div', 'thumb');
+    const cv = document.createElement('canvas');
+    cv.width = 168; cv.height = 168; cv.style.width = '100%'; cv.style.height = 'auto';
+    const ctx = cv.getContext('2d');
+    ctx.clearRect(0, 0, 168, 168);
+    const R = Math.max(4, 58 * g.angDiam / mx);
+    drawPhaseDisc(ctx, 84, 84, R, g.phase, 0, b.color, false);
+    ctx.save(); ctx.fillStyle = '#ffd479'; ctx.beginPath(); ctx.arc(160, 84, 5, 0, 7); ctx.fill(); ctx.restore();
+    d.appendChild(cv);
+    d.appendChild(el('div', 't1', (idx + 1) + '. ' + cfg.label));
+    d.appendChild(el('div', 't2', 'k ' + (g.k * 100).toFixed(0) + '% · ' + g.angDiam.toFixed(1) + '초'));
+    d.appendChild(el('div', 't2', elongText(g, 0)));
+    d.onclick = () => setT(Math.floor(bringInRange(nn, synodicDays(key))) + curHour() / 24);
+    host.appendChild(d);
+  });
+  $('t4StripNote').innerHTML = '썸네일은 <b>태양 방향을 오른쪽</b>으로 두고 그렸습니다 (노란 점이 태양 쪽). 원반 크기는 시지름에 비례하므로 가까울수록 큽니다. ' +
+    (inner ? '내행성은 내합에서 가장 크고 어둡고, 외합에서 가장 작고 밝습니다.'
+           : '외행성은 충에서 가장 크고, 위상각이 최대 ' + maxPhaseAngle(key).toFixed(0) + '도까지밖에 안 되므로 조명 비율이 ' +
+             (minIllumination(key) * 100).toFixed(0) + '% 아래로 내려가지 않습니다. 그래서 초승달 모양이 될 수 없습니다.');
+}
+
+function renderTab4() {
+  const key = ST.planet4, b = BODIES[key], n = ST.t;
+  const g = geo(key, n), cfg = configAt(key, n, 2.5);
+  drawOrbit(); drawPhaseMain();
+  const vis = drawHorizonStrip();
+  $('k4cfg').textContent = cfg.label + (cfg.exact ? '' : ' (' + cfg.delta.toFixed(1) + '도 차)');
+  $('k4el').textContent = elongText(g);
+  $('k4ph').textContent = g.phase.toFixed(2) + '도';
+  $('k4k').textContent = (g.k * 100).toFixed(1) + ' %';
+  $('k4ad').textContent = g.angDiam.toFixed(2) + ' 초';
+  $('k4d').textContent = g.d.toFixed(4) + ' AU';
+  $('k4eq').textContent = '관측 가능 시간 = 이각 / 15도 per hour = ' + g.elong.toFixed(1) + ' / 15 = ' + observingHours(g.elong).toFixed(2) + ' 시간';
+  $('k4obs').textContent = durString(observingHours(g.elong));
+  $('k4when').textContent = vis.when;
+  $('k4where').textContent = vis.where;
+  $('k4why').textContent = vis.why + '.';
+  if (b.kind === 'inner') {
+    $('t4ElongNote').innerHTML = '<span class="eq">sin(최대이각) = a행성 / a지구 = ' + b.a.toFixed(4) + ' → 최대이각 = ' +
+      maxElongation(key).toFixed(2) + '도</span><br>최대 관측 가능 시간 = ' + maxElongation(key).toFixed(1) + ' / 15 = ' +
+      durString(observingHours(maxElongation(key))) + '. 학습지의 수성 18 ~ 28도, 금성 약 45도 라는 범위는 <b>궤도 이심률</b> 때문에 생기며 이 원궤도 모형에는 넣지 않았습니다.';
+  } else {
+    $('t4ElongNote').innerHTML = '<span class="eq">sin(최대 위상각) = a지구 / a행성 = ' + (1 / b.a).toFixed(4) + ' → 최대 위상각 = ' +
+      maxPhaseAngle(key).toFixed(2) + '도</span><br>그래서 조명 비율은 아무리 작아도 ' + (minIllumination(key) * 100).toFixed(1) +
+      '% 이고, 외행성은 <b>초승달 모양으로 보이지 않습니다</b>. 충에서는 이각이 180도에 가까워 관측 가능 시간이 약 12시간입니다.';
+  }
+  document.querySelectorAll('#t4Planets button').forEach(x => x.classList.toggle('on', x.dataset.pk === key));
+  document.querySelectorAll('[data-kind]').forEach(x => x.classList.toggle('on', x.dataset.kind === ST.kind4));
+  $('btnStripEven').classList.toggle('on', ST.stripMode === 'even');
+  $('btnStripCfg').classList.toggle('on', ST.stripMode === 'cfg');
+  buildStrip();
+  buildCfgButtons();
+}
+function buildCfgButtons() {
+  const host = $('t4Cfg'); const key = ST.planet4;
+  host.innerHTML = '';
+  host.appendChild(el('span', 'small', '위치 관계로 이동:'));
+  configAngles(key).forEach(c => {
+    const bb = el('button', 'sm', c.name);
+    bb.onclick = () => gotoRel(key, c.rel);
+    host.appendChild(bb);
+  });
+}
+function setKind4(kind) {
+  ST.kind4 = kind;
+  const keys = kind === 'inner' ? INNER_KEYS : OUTER_KEYS;
+  if (keys.indexOf(ST.planet4) < 0) ST.planet4 = keys[0];
+  const host = $('t4Planets'); host.innerHTML = '';
+  keys.forEach(k => {
+    const b = el('button', 'sm', BODIES[k].ko);
+    b.dataset.pk = k; b.onclick = () => { ST.planet4 = k; render(); };
+    host.appendChild(b);
+  });
+  render();
+}
+function wireTab4() {
+  document.querySelectorAll('[data-kind]').forEach(b => b.onclick = () => setKind4(b.dataset.kind));
+  setKind4('inner');
+  $('sSkyH').oninput = e => setHour(+e.target.value / 60);
+  $('btnStripEven').onclick = () => { ST.stripMode = 'even'; render(); };
+  $('btnStripCfg').onclick = () => { ST.stripMode = 'cfg'; render(); };
+  /* 행성 끌기 */
+  const cv = $('cvOrbit');
+  let dragging = false;
+  const toPhi = (x, y) => {
+    const w = cv.clientWidth, h = cv.clientHeight;
+    return norm360(Math.atan2(-(y - h / 2), x - w / 2) * RAD);
+  };
+  const apply = phi => {
+    const key = ST.planet4;
+    const rel = BODIES[key].kind === 'inner' ? phi : norm360(-phi);
+    setT(nOfRel(key, rel, ST.t));
+  };
+  cv.addEventListener('pointerdown', e => {
+    dragging = true; cv.setPointerCapture(e.pointerId);
+    const r = cv.getBoundingClientRect(); apply(toPhi(e.clientX - r.left, e.clientY - r.top));
+  });
+  cv.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const r = cv.getBoundingClientRect(); apply(toPhi(e.clientX - r.left, e.clientY - r.top));
+  });
+  cv.addEventListener('pointerup', e => { dragging = false; cv.releasePointerCapture(e.pointerId); });
+  cv.addEventListener('pointercancel', () => { dragging = false; });
+}
+
+/* =====================================================================
+   TAB 5a  학습지 문항
+   ===================================================================== */
+function jumpCfg(kind, key, cfgName, hour) {
+  showTab(4); setKind4(kind); ST.planet4 = key;
+  const c = configAngles(key).filter(x => x.name === cfgName)[0];
+  if (c) gotoRel(key, c.rel, hour === undefined ? 20 : hour); else setT(ST.t);
+}
+const HANDOUT = [
+  {
+    id: 'P4-내-Q1', t: '학습지 4 · 내행성 · 1번',
+    q: '그림 1 의 위상 1 ~ 6 은 각각 어느 위치 관계에서 본 모습인가?',
+    act: () => { showTab(4); setKind4('inner'); ST.planet4 = 'venus'; ST.stripMode = 'even'; render(); document.getElementById('t4Strip').scrollIntoView({ block: 'center' }); },
+    exp: () => {
+      const key = 'venus', out = [];
+      for (let i = 0; i < 6; i++) {
+        const rel = i * 60, nn = nOfRel(key, rel, ST.t), g = geo(key, nn), cfg = configAt(key, nn, 3);
+        out.push((i + 1) + ') ' + cfg.label + '  ·  조명 비율 ' + (g.k * 100).toFixed(0) + '%  ·  시지름 ' + g.angDiam.toFixed(1) + '초' + ('  ·  이각 ' + elongText(g, 0)));
+      }
+      return '아래는 이 시뮬레이터가 회합주기를 6등분해서 다시 계산한 결과입니다 (금성 기준).\n' + out.join('\n') +
+        '\n\n순서: 내합 (가장 크고 어둡다) → 서방 → 외합 (가장 작고 보름달 모양) → 동방 → 다시 내합.\n' +
+        '내행성은 지구보다 안쪽을 돌기 때문에 위상이 그믐부터 보름까지 모두 나타나고, 시지름은 최대 ' +
+        (maxAngDiam(key) / minAngDiam(key)).toFixed(1) + '배까지 달라집니다.';
+    }
+  },
+  {
+    id: 'P4-내-Q2', t: '학습지 4 · 내행성 · 2번',
+    q: '내행성이 a ~ e (ㄱ ~ ㅁ) 위치에 있을 때, 각각 언제 어느 쪽 하늘에서 관측되는가?',
+    act: () => { showTab(4); setKind4('inner'); ST.planet4 = 'venus'; jumpCfg('inner', 'venus', '동방최대이각', 19); document.getElementById('cvHorizon').scrollIntoView({ block: 'center' }); },
+    exp: () => {
+      const key = ST.planet4 && BODIES[ST.planet4].kind === 'inner' ? ST.planet4 : 'venus';
+      return configAngles(key).map(c => {
+        const nn = nOfRel(key, c.rel, ST.t), v = visibilityKo(key, nn), g = geo(key, nn);
+        return c.name + ' (이각 ' + elongText(g, 1) + ') → ' + v.when + ' ' + v.where + '. ' + v.why + '.';
+      }).join('\n') + '\n\n핵심: 태양보다 동쪽에 있으면 태양보다 늦게 지므로 <초저녁 서쪽 하늘>, 태양보다 서쪽에 있으면 태양보다 먼저 뜨므로 <새벽 동쪽 하늘> 입니다.';
+    }
+  },
+  {
+    id: 'P4-내-Q3', t: '학습지 4 · 내행성 · 3번',
+    q: '내행성을 관측하기 어려운 위치 관계는 무엇이고, 그 까닭은 무엇인가?',
+    act: () => jumpCfg('inner', ST.planet4 && BODIES[ST.planet4].kind === 'inner' ? ST.planet4 : 'venus', '내합', 12),
+    exp: () => {
+      const key = BODIES[ST.planet4] && BODIES[ST.planet4].kind === 'inner' ? ST.planet4 : 'venus';
+      const a = nOfRel(key, 0, ST.t), b = nOfRel(key, 180, ST.t);
+      const ga = geo(key, a), gb = geo(key, b);
+      return '내합: 이각 ' + ga.elong.toFixed(1) + '도, 관측 가능 시간 ' + durString(observingHours(ga.elong)) + '\n' +
+        '외합: 이각 ' + gb.elong.toFixed(1) + '도, 관측 가능 시간 ' + durString(observingHours(gb.elong)) + '\n\n' +
+        '둘 다 이각이 0도에 가깝습니다. 즉 태양과 거의 같은 방향에 있어 태양이 뜨고 질 때 같이 뜨고 집니다. ' +
+        '낮 하늘의 태양빛에 묻혀 보이지 않습니다. 내합은 어두운 면을 보여 주기까지 합니다 (조명 비율 ' + (ga.k * 100).toFixed(0) + '%).';
+    }
+  },
+  {
+    id: 'P4-내-Q4', t: '학습지 4 · 내행성 · 4번',
+    q: '내행성을 가장 오래 관측할 수 있는 위치 관계는 무엇이고, 그 까닭은 무엇인가?',
+    act: () => jumpCfg('inner', BODIES[ST.planet4] && BODIES[ST.planet4].kind === 'inner' ? ST.planet4 : 'venus', '동방최대이각', 19),
+    exp: () => {
+      const key = BODIES[ST.planet4] && BODIES[ST.planet4].kind === 'inner' ? ST.planet4 : 'venus';
+      const e = maxElongation(key);
+      return '답: 최대이각 (동방최대이각 또는 서방최대이각).\n\n' +
+        '까닭: 이 위치에서 태양과 가장 크게 떨어져 보이기 때문입니다. ' + BODIES[key].ko + ' 의 최대이각은 ' + e.toFixed(2) + '도이고, ' +
+        '천체는 1시간에 15도씩 지므로 관측 가능 시간 = ' + e.toFixed(1) + ' / 15 = ' + durString(observingHours(e)) + ' 입니다.\n' +
+        '동방최대이각이면 해가 진 뒤 서쪽 하늘에서 이만큼, 서방최대이각이면 해뜨기 전 동쪽 하늘에서 이만큼 볼 수 있습니다.';
+    }
+  },
+  {
+    id: 'P4-내-Q5', t: '학습지 4 · 내행성 · 5번',
+    q: '수성의 최대이각은 18도 ~ 28도, 금성의 최대이각은 약 45도이다. 각각 최대 몇 시간 동안 관측할 수 있는가?',
+    act: () => { showTab(4); setKind4('inner'); ST.planet4 = 'mercury'; jumpCfg('inner', 'mercury', '동방최대이각', 19); },
+    exp: () => {
+      const f = e => e.toFixed(1) + '도 / 15도 per hour = ' + durString(observingHours(e));
+      return '천체는 일주운동으로 1시간에 15도씩 움직입니다. 그래서\n' +
+        '  관측 가능 시간 = 이각 / 15\n\n' +
+        '수성 (학습지 범위): ' + f(18) + ' ~ ' + f(28) + '\n' +
+        '금성 (학습지 값):  ' + f(45) + '\n\n' +
+        '이 시뮬레이터의 원궤도 값으로 계산하면\n' +
+        '  수성 ' + f(maxElongation('mercury')) + '\n  금성 ' + f(maxElongation('venus')) + '\n' +
+        '학습지의 수성 18 ~ 28도 처럼 폭이 있는 것은 수성 궤도의 이심률이 커서 최대이각이 매번 달라지기 때문입니다.';
+    }
+  },
+  {
+    id: 'P4-외-Q2', t: '학습지 4 · 외행성 · 2번',
+    q: '외행성을 관측하기 어려운 위치 관계는 무엇인가?',
+    act: () => jumpCfg('outer', BODIES[ST.planet4] && BODIES[ST.planet4].kind === 'outer' ? ST.planet4 : 'mars', '합', 12),
+    exp: () => {
+      const key = BODIES[ST.planet4] && BODIES[ST.planet4].kind === 'outer' ? ST.planet4 : 'mars';
+      const nn = nOfRel(key, 180, ST.t), g = geo(key, nn);
+      const rts = riseTransitSet(nn, g.ra, g.dec, ST.lat);
+      return '답: 합.\n\n이각 ' + g.elong.toFixed(1) + '도로 태양과 거의 같은 방향입니다. 남중 시각이 ' + hmString(rts.transit) +
+        ' 로 태양과 같이 뜨고 지므로 낮 하늘에 있게 되어 보이지 않습니다. 관측 가능 시간 = ' +
+        g.elong.toFixed(1) + ' / 15 = ' + durString(observingHours(g.elong)) + ' 입니다.\n' +
+        '또한 이때 지구와 가장 멀어서 (' + g.d.toFixed(2) + ' AU) 시지름도 가장 작습니다 (' + g.angDiam.toFixed(1) + '초).';
+    }
+  },
+  {
+    id: 'P4-외-Q3/4/5', t: '학습지 4 · 외행성 · 3, 4, 5번',
+    q: '위상 2 는 어느 위치 관계인가? 위상 5 는? 가장 오래 관측할 수 있는 위치 관계는?',
+    act: () => jumpCfg('outer', BODIES[ST.planet4] && BODIES[ST.planet4].kind === 'outer' ? ST.planet4 : 'mars', '충', 0),
+    exp: () => {
+      const key = BODIES[ST.planet4] && BODIES[ST.planet4].kind === 'outer' ? ST.planet4 : 'mars';
+      const line = name => {
+        const c = configAngles(key).filter(x => x.name === name)[0];
+        const nn = nOfRel(key, c.rel, ST.t), g = geo(key, nn), v = visibilityKo(key, nn);
+        const rts = riseTransitSet(nn, g.ra, g.dec, ST.lat);
+        return name + ': 이각 ' + elongText(g, 1) + ', 관측 가능 시간 ' + durString(observingHours(g.elong)) +
+          ', 출 ' + (rts.rise === null ? '-' : hmString(rts.rise)) + ' 남중 ' + hmString(rts.transit) + ' 몰 ' + (rts.set === null ? '-' : hmString(rts.set)) +
+          '  →  ' + v.when + ' ' + v.where;
+      };
+      return '동구 (위상 2): ' + line('동구') + '\n서구 (위상 5): ' + line('서구') + '\n충: ' + line('충') + '\n\n' +
+        '동구는 해질 무렵 남중해서 자정에 지므로 초저녁 약 6시간, 서구는 자정에 떠서 해뜰 무렵 남중하므로 새벽 약 6시간입니다. ' +
+        '충은 해질 때 떠서 자정에 남중하고 해뜰 때 지므로 밤새, 약 12시간 관측할 수 있습니다. 가장 오래 볼 수 있는 것은 충입니다.';
+    }
+  },
+  {
+    id: 'P4-외-Q6', t: '학습지 4 · 외행성 · 6번',
+    q: '내행성과 비교할 때 외행성 관측의 특징을 위상과 관측 시간의 관점에서 설명하시오.',
+    act: () => jumpCfg('outer', 'mars', '충', 0),
+    exp: () => {
+      const rows = ['mercury', 'venus', 'mars', 'jupiter', 'saturn'].map(k => {
+        const b = BODIES[k];
+        return b.ko + ': 최대 위상각 ' + maxPhaseAngle(k).toFixed(1) + '도, 최소 조명 비율 ' +
+          (b.kind === 'inner' ? '0 % (그믐 모양까지)' : (minIllumination(k) * 100).toFixed(1) + ' %') +
+          ', 최대 이각 ' + (b.kind === 'inner' ? maxElongation(k).toFixed(1) + '도' : '약 180도') +
+          ', 최대 관측 시간 ' + durString(observingHours(b.kind === 'inner' ? maxElongation(k) : 180));
+      });
+      return rows.join('\n') + '\n\n' +
+        '1) 외행성은 충에서 이각이 180도에 가까워 밤새 (약 12시간) 볼 수 있습니다. 내행성은 최대이각에서도 ' +
+        durString(observingHours(maxElongation('venus'))) + ' 를 넘지 못합니다.\n' +
+        '2) 외행성은 위상각이 sin(i) = a지구 / a행성 으로 제한되므로 초승달 모양이 될 수 없습니다. ' +
+        '화성도 최소 ' + (minIllumination('mars') * 100).toFixed(0) + '%, 목성은 ' + (minIllumination('jupiter') * 100).toFixed(0) + '% 까지만 이지러집니다.\n' +
+        '3) 외행성은 한밤중 남쪽 하늘에서도 볼 수 있지만, 내행성은 초저녁 서쪽이나 새벽 동쪽에서만 볼 수 있습니다.';
+    }
+  },
+  {
+    id: 'P3', t: '학습지 3 · 행성의 겉보기 운동',
+    q: '역행이 일어나는 까닭은 무엇인가? 순행과 역행일 때 적경은 각각 어떻게 변하는가? 역행할 때 행성의 위치 관계는?',
+    act: () => {
+      showTab(3);
+      const iv = nearestRetrograde(ST.planet3, ST.t);
+      if (iv) setT(Math.floor((iv.start + iv.end) / 2) + curHour() / 24);
+    },
+    exp: () => {
+      const key = ST.planet3, iv = nearestRetrograde(key, ST.t);
+      if (!iv) return '역행 구간을 찾지 못했습니다.';
+      const mid = (iv.start + iv.end) / 2, cfg = configAt(key, mid, 3), g = geo(key, mid);
+      const before = raRate(key, iv.start - 15) * 3600, during = raRate(key, mid) * 3600;
+      return '까닭: 지구와 행성은 같은 방향으로 공전하지만 공전 속도가 다릅니다. 그래서 지구에서 본 시선 방향이 되돌아가는 구간이 생깁니다. ' +
+        '행성이 실제로 거꾸로 도는 것이 아니라 상대 운동 때문에 그렇게 보이는 것입니다.\n\n' +
+        '순행: 서 → 동, 적경 증가 (지금 계산값 ' + before.toFixed(1) + ' 초/일)\n' +
+        '역행: 동 → 서, 적경 감소 (지금 계산값 ' + during.toFixed(1) + ' 초/일)\n' +
+        '유: 방향이 바뀌는 순간, 적경 변화율이 0\n\n' +
+        BODIES[key].ko + ' 의 이번 역행: ' + koDate(iv.start) + ' ~ ' + koDate(iv.end) + ' (' + (iv.end - iv.start).toFixed(1) + '일)\n' +
+        '역행 한가운데의 위치 관계 = ' + cfg.label + ' (이각 ' + g.elong.toFixed(1) + '도)\n' +
+        '→ 내행성은 내합에서, 외행성은 충에서 역행합니다. 그때 지구와 가장 가까워 시지름도 가장 큽니다 (' + g.angDiam.toFixed(1) + '초).';
+    }
+  },
+];
+function buildHandout() {
+  const host = $('qList'); host.innerHTML = '';
+  HANDOUT.forEach(q => {
+    const d = el('div', 'q');
+    d.appendChild(el('div', 'qh', q.id + '  ·  ' + q.t));
+    d.appendChild(el('div', 'qt', q.q));
+    const row = el('div', 'row');
+    const b1 = el('button', 'sm', '시뮬레이터로 확인');
+    const b2 = el('button', 'sm', '해설 보기');
+    row.appendChild(b1); row.appendChild(b2); d.appendChild(row);
+    const exp = el('div', 'exp'); exp.hidden = true; d.appendChild(exp);
+    b1.onclick = () => { q.act(); exp.textContent = q.exp(); exp.hidden = false; b2.textContent = '해설 접기'; };
+    b2.onclick = () => { if (exp.hidden) { exp.textContent = q.exp(); exp.hidden = false; b2.textContent = '해설 접기'; } else { exp.hidden = true; b2.textContent = '해설 보기'; } };
+    host.appendChild(d);
+  });
+}
+
+/* =====================================================================
+   TAB 5b  랜덤 자가 점검
+   ===================================================================== */
+const TPL_NAME = { 1: '위상과 시지름 → 위치 관계', 2: '위치 관계 → 관측 시간과 방향', 3: '적경 변화 → 순행 역행 유',
+  4: '위도와 적위 → 주극성 판정', 5: '날짜 → 태양의 적경 적위', 6: '고도 계산', 7: '최대이각 → 관측 가능 시간' };
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+function recordAnswer(tpl, ok) {
+  const q = ST.quiz; q.tries++; if (ok) q.right++;
+  if (!q.per[tpl]) q.per[tpl] = { t: 0, r: 0 };
+  q.per[tpl].t++; if (ok) q.per[tpl].r++;
+  $('scoreTag').textContent = q.right + ' / ' + q.tries;
+  const lines = Object.keys(q.per).sort().map(k => TPL_NAME[k] + ' : ' + q.per[k].r + ' / ' + q.per[k].t);
+  $('qBreak').innerHTML = lines.length ? '유형별 정답률<br>' + lines.join('<br>') : '';
+}
+function qShell(tpl, questionText, extraNode) {
+  const host = $('qBox'); host.innerHTML = '';
+  const d = el('div', 'q');
+  d.appendChild(el('div', 'qh', '유형 ' + tpl + '  ·  ' + TPL_NAME[tpl]));
+  d.appendChild(el('div', 'qt', questionText));
+  if (extraNode) d.appendChild(extraNode);
+  const ch = el('div', 'choices'); d.appendChild(ch);
+  const exp = el('div', 'exp'); exp.hidden = true; d.appendChild(exp);
+  host.appendChild(d);
+  return { d: d, ch: ch, exp: exp };
+}
+function finish(sh, ok, explanation, jumpLabel, jumpFn) {
+  sh.exp.innerHTML = '';
+  sh.exp.appendChild(el('div', '', (ok ? '정답입니다. ' : '틀렸습니다. ') + explanation));
+  if (jumpFn) {
+    const b = el('button', 'sm', jumpLabel || '시뮬레이터에서 보기');
+    b.style.marginTop = '8px'; b.onclick = jumpFn; sh.exp.appendChild(b);
+  }
+  sh.exp.hidden = false;
+}
+function choiceButtons(sh, options, correctIdx, onDone) {
+  options.forEach((o, i) => {
+    const b = el('button', '', o);
+    b.onclick = () => {
+      if (sh.ch.dataset.done) return;
+      sh.ch.dataset.done = '1';
+      sh.ch.querySelectorAll('button').forEach((x, j) => { if (j === correctIdx) x.classList.add('right'); });
+      if (i !== correctIdx) b.classList.add('wrong');
+      onDone(i === correctIdx);
+    };
+    sh.ch.appendChild(b);
+  });
+}
+function numberAnswer(sh, fields, check, onDone) {
+  const row = el('div', 'row');
+  const inputs = fields.map(f => {
+    const wrap = el('span', 'row');
+    wrap.appendChild(el('span', 'small', f.label));
+    const inp = document.createElement('input');
+    inp.type = 'number'; inp.step = 'any'; inp.style.width = '110px'; inp.inputMode = 'decimal';
+    wrap.appendChild(inp); row.appendChild(wrap); return inp;
+  });
+  const b = el('button', '', '확인');
+  row.appendChild(b); sh.ch.appendChild(row);
+  b.onclick = () => {
+    if (sh.ch.dataset.done) return;
+    const vals = inputs.map(i => parseFloat(i.value));
+    if (vals.some(v => !isFinite(v))) { return; }
+    sh.ch.dataset.done = '1';
+    onDone(check(vals));
+  };
+}
+
+function newQuestion() {
+  const tpl = 1 + Math.floor(Math.random() * 7);
+  const n0 = BASE_DAY + Math.random() * DAY_SPAN;
+  if (tpl === 1) {
+    const key = pick(PLANET_KEYS), cfgs = configAngles(key);
+    const idx = Math.floor(Math.random() * cfgs.length);
+    const nn = nOfRel(key, cfgs[idx].rel, n0), g = geo(key, nn), vis = visibilityKo(key, nn);
+    const cvw = 200, cv = document.createElement('canvas');
+    cv.width = 300; cv.height = 200; cv.style.width = '220px'; cv.style.height = '147px'; cv.style.background = '#05080f';
+    cv.style.borderRadius = '10px'; cv.style.border = '1px solid #26324b'; cv.style.display = 'block';
+    const ctx = cv.getContext('2d');
+    const R = Math.max(5, 64 * g.angDiam / maxAngDiam(key));
+    drawPhaseDisc(ctx, 130, 100, R, g.phase, 0, BODIES[key].color, true);
+    txt(ctx, 8, 14, BODIES[key].ko + ' · 시지름 ' + g.angDiam.toFixed(1) + '초', '#a9b8d4', 'left', 12);
+    const clue = (g.elong < 8) ? '태양과 거의 같은 방향이라 관측하기 어려웠다'
+      : vis.when + ' ' + vis.where + '에서 보였다';
+    const sh = qShell(1, BODIES[key].ko + ' 을 관측했더니 아래와 같은 위상과 시지름으로 보였고, ' + clue + '.\n이때의 위치 관계는 무엇인가?', cv);
+    const opts = cfgs.map(c => c.name);
+    const order = shuffle(opts.map((o, i) => i));
+    const shown = order.map(i => opts[i]);
+    choiceButtons(sh, shown, order.indexOf(idx), ok => {
+      finish(sh, ok, '정답은 <b>' + cfgs[idx].name + '</b> 입니다. 조명 비율 ' + (g.k * 100).toFixed(0) + '%, 시지름 ' + g.angDiam.toFixed(1) +
+        '초 (가장 클 때 ' + maxAngDiam(key).toFixed(1) + '초, 가장 작을 때 ' + minAngDiam(key).toFixed(1) + '초), 이각 ' +
+        elongText(g, 1) + '. 시지름은 가까울수록 커집니다.',
+        '탭 4에서 이 위치 보기', () => { showTab(4); setKind4(BODIES[key].kind); ST.planet4 = key; setT(Math.floor(nn) + 20 / 24); });
+      recordAnswer(1, ok);
+    });
+  } else if (tpl === 2) {
+    const key = pick(PLANET_KEYS), cfgs = configAngles(key);
+    const idx = Math.floor(Math.random() * cfgs.length);
+    const nn = nOfRel(key, cfgs[idx].rel, n0);
+    const answers = cfgs.map(c => { const v = visibilityKo(key, nOfRel(key, c.rel, n0)); return v.when + ' · ' + v.where; });
+    const uniq = []; answers.forEach(a => { if (uniq.indexOf(a) < 0) uniq.push(a); });
+    while (uniq.length < 4) { const cand = pick(['한밤중 · 남쪽 하늘', '초저녁 · 동쪽 하늘', '새벽 · 서쪽 하늘', '하루 종일 · 북쪽 하늘']); if (uniq.indexOf(cand) < 0) uniq.push(cand); }
+    const correct = answers[idx];
+    const shown = shuffle(uniq.slice(0, 4).indexOf(correct) >= 0 ? uniq.slice(0, 4) : [correct].concat(uniq.filter(x => x !== correct).slice(0, 3)));
+    const sh = qShell(2, BODIES[key].ko + ' 이 ' + cfgs[idx].name + ' 에 있을 때, 언제 어느 쪽 하늘에서 관측되는가?');
+    choiceButtons(sh, shown, shown.indexOf(correct), ok => {
+      const v = visibilityKo(key, nn), g = geo(key, nn);
+      finish(sh, ok, '정답은 <b>' + correct + '</b>. 이각이 ' + elongText(g, 1) + '이므로 ' + v.why +
+        '. 관측 가능 시간 = ' + g.elong.toFixed(1) + ' / 15 = ' + durString(observingHours(g.elong)) + '.',
+        '탭 4 하늘 그림 보기', () => { showTab(4); setKind4(BODIES[key].kind); ST.planet4 = key; setT(Math.floor(nn) + (v.when === '새벽' ? 5 : 20) / 24); });
+      recordAnswer(2, ok);
+    });
+  } else if (tpl === 3) {
+    const key = pick(['mars', 'jupiter', 'saturn', 'venus', 'mercury']);
+    let cn;
+    if (Math.random() < 0.34) {
+      const iv = nearestRetrograde(key, n0);
+      cn = iv ? (Math.random() < 0.5 ? iv.start : iv.end) - 2.5 : n0;
+    } else cn = n0;
+    const span = 5, a0 = geo(key, cn).ra;
+    const series = []; let acc = 0, prev = a0;
+    for (let i = 0; i <= 40; i++) { const nn = cn + span * i / 40, r = geo(key, nn).ra; acc += norm180(r - prev); prev = r; series.push({ i: i, v: acc * 3600 }); }
+    const total = series[series.length - 1].v;
+    const ans = Math.abs(total) < 30 ? '유' : (total > 0 ? '순행' : '역행');
+    const cv = document.createElement('canvas');
+    cv.width = 560; cv.height = 260; cv.style.width = '100%'; cv.style.height = 'auto'; cv.style.background = '#05080f';
+    cv.style.borderRadius = '10px'; cv.style.border = '1px solid #26324b'; cv.style.display = 'block';
+    const ctx = cv.getContext('2d');
+    let mn = 1e9, mx = -1e9; series.forEach(p => { mn = Math.min(mn, p.v); mx = Math.max(mx, p.v); });
+    const pad = Math.max(20, (mx - mn) * 0.3); mn -= pad; mx += pad;
+    const X = i => 60 + 470 * i / 40, Y = v => 220 - 190 * (v - mn) / (mx - mn);
+    ctx.strokeStyle = '#26324b'; ctx.strokeRect(60, 30, 470, 190);
+    ctx.beginPath(); ctx.strokeStyle = '#6cc5ff'; ctx.lineWidth = 2.4;
+    series.forEach((p, i) => i ? ctx.lineTo(X(p.i), Y(p.v)) : ctx.moveTo(X(p.i), Y(p.v)));
+    ctx.stroke();
+    txt(ctx, 295, 245, '시간 (5일)', '#8595b4', 'center', 13);
+    txt(ctx, 12, 125, '적경 변화 (초)', '#8595b4', 'left', 13);
+    txt(ctx, 56, Y(series[0].v), '0', '#8595b4', 'right', 12);
+    txt(ctx, 56, Y(total), total.toFixed(0), '#8595b4', 'right', 12);
+    const sh = qShell(3, BODIES[key].ko + ' 의 5일 동안 적경 변화를 나타낸 그래프이다. 이 기간의 겉보기 운동은?', cv);
+    const opts = ['순행', '역행', '유'];
+    choiceButtons(sh, opts, opts.indexOf(ans), ok => {
+      finish(sh, ok, '정답은 <b>' + ans + '</b>. 5일 동안 적경이 ' + total.toFixed(0) + '초 ' + (total > 0 ? '늘었습니다' : '줄었습니다') +
+        '. 적경이 늘면 순행 (서 → 동), 줄면 역행 (동 → 서), 거의 변하지 않으면 유입니다.',
+        '탭 3 경로 보기', () => { showTab(3); ST.planet3 = key; ST.win = 180; $('selWin').value = '180'; setT(Math.floor(cn + 2.5) + curHour() / 24); });
+      recordAnswer(3, ok);
+    });
+  } else if (tpl === 4) {
+    const lat = Math.round((Math.random() * 150 - 75) * 2) / 2;
+    const dec = Math.round(Math.random() * 170 - 85);
+    const ans = starTypeKo(lat, dec);
+    const sh = qShell(4, '위도 ' + lat.toFixed(1) + '도인 곳에서 적위가 ' + dec + '도인 별을 본다. 이 별은 무엇인가?');
+    const opts = ['주극성', '출몰성', '전몰성'];
+    choiceButtons(sh, opts, opts.indexOf(ans), ok => {
+      const bd = decBoundaries(lat), ri = riseInfo(lat, dec);
+      finish(sh, ok, '정답은 <b>' + ans + '</b>. 위도 ' + lat.toFixed(1) + '도에서는 적위 ' +
+        (lat >= 0 ? bd.circumpolar.toFixed(1) + '도 이상이면 주극성, ' + bd.never.toFixed(1) + '도 이하면 전몰성'
+                  : bd.circumpolar.toFixed(1) + '도 이하면 주극성, ' + bd.never.toFixed(1) + '도 이상이면 전몰성') +
+        ' 입니다 (경계 = 90도 - |위도|). 이 별이 지평선 위에 있는 시간은 ' +
+        (ri.type === 'circumpolar' ? '24시간' : ri.type === 'never' ? '0시간' : durString(ri.hours)) + ' 입니다.',
+        '탭 1에서 보기', () => { showTab(1); ST.lat = lat; ST.star.dec = dec; setT(ST.t); });
+      recordAnswer(4, ok);
+    });
+  } else if (tpl === 5) {
+    const yr = 2026, doy = 1 + Math.floor(Math.random() * 365);
+    const nn = nFromYMD(yr, 1, 1) + doy - 1 + 0.5, s = sunPos(nn);
+    const sh = qShell(5, koDate(nn) + ' 의 태양의 적경과 적위는 얼마인가?\n(적경은 시간 단위, 적위는 도 단위. 소수 첫째 자리까지)');
+    numberAnswer(sh, [{ label: '적경 (h)' }, { label: '적위 (도)' }],
+      v => Math.abs(norm180((v[0] - s.raH) * 15)) / 15 <= 0.25 && Math.abs(v[1] - s.dec) <= 1.2,
+      ok => {
+        finish(sh, ok, '정답은 적경 <b>' + s.raH.toFixed(2) + ' h</b>, 적위 <b>' + s.dec.toFixed(2) + '도</b> 입니다. ' +
+          '이 날 태양의 황경은 ' + s.lam.toFixed(1) + '도이고, δ = asin(sin23.44도 × sinλ), α = atan2(cos23.44도 × sinλ, cosλ) 로 구합니다. ' +
+          '춘분 (황경 0도) 에서 하루 약 0.99도씩 늘어난다고 어림해도 됩니다.',
+          '탭 2에서 보기', () => { showTab(2); setT(Math.floor(nn) + curHour() / 24); });
+        recordAnswer(5, ok);
+      });
+  } else if (tpl === 6) {
+    const lat = Math.round((Math.random() * 120 - 60) * 2) / 2;
+    const dec = Math.round(Math.random() * 120 - 60);
+    const H = Math.round((Math.random() * 240 - 120) / 15) * 15;
+    const ra = Math.round(Math.random() * 24) * 15;
+    const aa = altaz(H, dec, lat);
+    const sh = qShell(6, '위도 ' + lat.toFixed(1) + '도에서 적경 ' + (ra / 15).toFixed(0) + 'h, 적위 ' + dec + '도인 별의 시간각이 ' +
+      (H / 15).toFixed(0) + 'h (' + H + '도) 이다. 이 별의 고도는 몇 도인가?\n(sin h = sinδ sinφ + cosδ cosφ cosH)');
+    numberAnswer(sh, [{ label: '고도 h (도)' }], v => Math.abs(v[0] - aa.h) <= 1.2, ok => {
+      finish(sh, ok, '정답은 <b>' + aa.h.toFixed(2) + '도</b> 입니다. sin h = sin(' + dec + ') sin(' + lat + ') + cos(' + dec + ') cos(' + lat + ') cos(' + H + ') = ' +
+        sind(aa.h).toFixed(4) + '. 이때 방위각은 ' + aa.A.toFixed(1) + '도, 천정거리는 ' + aa.Z.toFixed(2) + '도이고 h + Z = 90도 입니다.',
+        '탭 1에서 보기', () => { showTab(1); ST.lat = lat; ST.star.dec = dec; ST.star.ra = norm360(lstDeg(ST.t) - H); setT(ST.t); });
+      recordAnswer(6, ok);
+    });
+  } else {
+    const which = Math.random() < 0.5 ? 'mercury' : 'venus';
+    const e = which === 'mercury' ? 18 + Math.random() * 10 : 44 + Math.random() * 3;
+    const ev = Math.round(e * 10) / 10;
+    const sh = qShell(7, BODIES[which].ko + ' 의 최대이각이 ' + ev.toFixed(1) + '도일 때, 최대 몇 시간 동안 관측할 수 있는가?\n(소수 둘째 자리까지, 시간 단위)');
+    numberAnswer(sh, [{ label: '시간' }], v => Math.abs(v[0] - ev / 15) <= 0.15, ok => {
+      finish(sh, ok, '정답은 <b>' + (ev / 15).toFixed(2) + ' 시간</b> (' + durString(ev / 15) + ') 입니다. ' +
+        '일주운동으로 천체는 1시간에 15도씩 움직이므로 관측 가능 시간 = 이각 / 15 = ' + ev.toFixed(1) + ' / 15 입니다.',
+        '탭 4에서 보기', () => { showTab(4); setKind4('inner'); ST.planet4 = which; jumpCfg('inner', which, '동방최대이각', 19); });
+      recordAnswer(7, ok);
+    });
+  }
+}
+
+/* =====================================================================
+   검증 패널
+   ===================================================================== */
+let vBuilt = false;
+function buildVerify() {
+  const rows = verifyAll();
+  const pass = rows.filter(r => r.pass).length;
+  $('vSummary').innerHTML = '<div class="' + (pass === rows.length ? 'okbox' : 'warnbox') + '">' +
+    pass + ' / ' + rows.length + ' 통과. 기대값은 화면에 박아 넣은 상수가 아니라 엔진 함수로 다시 계산한 값입니다.</div>';
+  const t = $('vTable');
+  t.innerHTML = '<tr><th>결과</th><th>항목</th><th>기대</th><th>실제</th><th>비고</th></tr>';
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td class="' + (r.pass ? 'p' : 'f') + '">' + (r.pass ? 'PASS' : 'FAIL') + '</td>' +
+      '<td>' + r.name + '</td><td>' + r.expected + '</td><td>' + r.actual + '</td><td>' + r.note + '</td>';
+    t.appendChild(tr);
+  });
+  vBuilt = true;
+}
+function toggleVerify() {
+  const v = $('verify');
+  if (v.hidden) { if (!vBuilt) buildVerify(); v.hidden = false; } else v.hidden = true;
+}
+
+/* =====================================================================
+   렌더 및 초기화
+   ===================================================================== */
+function render() {
+  if (!document.getElementById('tab1')) return;
+  syncBar();
+  try {
+    if (ST.tab === 1) renderTab1();
+    else if (ST.tab === 2) renderTab2();
+    else if (ST.tab === 3) renderTab3();
+    else if (ST.tab === 4) renderTab4();
+  } catch (err) { console.error(err); }
+}
+function init() {
+  wireBar(); wireTab1(); wireTab2(); wireTab3(); wireTab4();
+  buildHandout();
+  $('btnNewQ').onclick = newQuestion;
+  document.querySelectorAll('[data-sub]').forEach(b => b.onclick = () => {
+    ST.sub5 = b.dataset.sub;
+    $('sub5a').hidden = ST.sub5 !== 'a'; $('sub5b').hidden = ST.sub5 !== 'b';
+    document.querySelectorAll('[data-sub]').forEach(x => x.classList.toggle('on', x.dataset.sub === ST.sub5));
+    if (ST.sub5 === 'b' && !$('qBox').firstChild) newQuestion();
+  });
+  $('btnVerify').onclick = toggleVerify;
+  $('btnVClose').onclick = toggleVerify;
+  window.addEventListener('keydown', e => {
+    if (e.key === 'v' || e.key === 'V') {
+      const tag = (e.target && e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
+      toggleVerify();
+    }
+  });
+  let rt = null;
+  window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(render, 120); });
+  showTab(1); syncBar(); render();
+  requestAnimationFrame(loop);
+  /* 콘솔에도 검증표를 남긴다 */
+  const rows = verifyAll(), pass = rows.filter(r => r.pass).length;
+  console.log('[검증] ' + pass + ' / ' + rows.length + ' PASS');
+  rows.filter(r => !r.pass).forEach(r => console.warn('FAIL', r.name, r.expected, r.actual));
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
+</script>
